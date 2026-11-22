@@ -17,9 +17,8 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Three.js (r128) & JSZip para descarga modular en ZIP -->
+  <!-- Three.js (r128) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
   <!-- Configuración personalizada de Tailwind inspirada en Beagle & Copper -->
   <script>
@@ -83,6 +82,32 @@
     ::-webkit-scrollbar-thumb {
       background: linear-gradient(180deg, #D4A373, #C88A55);
       border-radius: 9999px;
+    }
+
+    /* ==========================================================================
+       EFECTO DE MOVIMIENTO PARA LA IMAGEN PRINCIPAL "CASA DE MARISCOS.jpg"
+       Ken Burns + deriva continua (el parallax con mouse/scroll se aplica por JS)
+       ========================================================================== */
+    @keyframes heroCinematicDrift {
+      0%   { transform: scale(1.06) translate3d(0, 0, 0); }
+      25%  { transform: scale(1.12) translate3d(-2%, 1.5%, 0); }
+      50%  { transform: scale(1.10) translate3d(2%, -1.5%, 0); }
+      75%  { transform: scale(1.14) translate3d(-1.5%, -2%, 0); }
+      100% { transform: scale(1.06) translate3d(0, 0, 0); }
+    }
+
+    .hero-motion {
+      animation: heroCinematicDrift 26s ease-in-out infinite;
+      will-change: transform;
+      backface-visibility: hidden;
+    }
+
+    #heroParallax {
+      will-change: transform;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-motion { animation: none; }
     }
 
     /* Lienzo 3D Three.js */
@@ -212,17 +237,8 @@
           </a>
         </nav>
 
-        <!-- Controles: Descargar ZIP, Admin (0608), Carrito WhatsApp y Menú Móvil -->
+        <!-- Controles: Admin (0608), Carrito WhatsApp y Menú Móvil -->
         <div class="flex items-center gap-2 sm:gap-2.5">
-          <!-- Descargar ZIP del Proyecto -->
-          <button
-            onclick="downloadProjectZip()"
-            title="Descargar proyecto completo en ZIP (HTML, CSS, JS, Three.js)"
-            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-white/15 bg-white/5 text-bone/85 hover:bg-white/10 hover:text-copper-400 transition-all">
-            <i class="fa-solid fa-file-zipper text-copper-500"></i>
-            <span class="hidden xl:inline">ZIP</span>
-          </button>
-
           <!-- Botón Administrador (Clave 0608) -->
           <button
             onclick="openAdminModal()"
@@ -261,11 +277,8 @@
       <a href="#carta" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">La Carta & Buscador</a>
       <a href="#reservas" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Reservar Mesa</a>
       <a href="#ubicacion" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Ubicación & Mapa</a>
-      <div class="pt-3 border-t border-white/10 flex gap-2">
-        <button onclick="downloadProjectZip(); toggleMobileMenu();" class="flex-1 py-2.5 px-3 rounded-lg bg-copper-500/20 border border-copper-500/40 text-copper-400 text-xs font-semibold">
-          <i class="fa-solid fa-file-zipper mr-1"></i> Descargar ZIP
-        </button>
-        <button onclick="openAdminModal(); toggleMobileMenu();" class="flex-1 py-2.5 px-3 rounded-lg bg-white/5 border border-white/15 text-bone text-xs font-semibold">
+      <div class="pt-3 border-t border-white/10">
+        <button onclick="openAdminModal(); toggleMobileMenu();" class="w-full py-2.5 px-3 rounded-lg bg-white/5 border border-white/15 text-bone text-xs font-semibold">
           <i class="fa-solid fa-key text-copper-500 mr-1"></i> Admin (0608)
         </button>
       </div>
@@ -274,18 +287,20 @@
 
   <main>
     <!-- =====================================================================
-         2. HERO SECTION FULL-BLEED CON "CASA DE MARISCOS.jpg" + TÍTULOS 3 SEG.
+         2. HERO SECTION FULL-BLEED CON "CASA DE MARISCOS.jpg" + MOVIMIENTO + TÍTULOS 3 SEG.
          ===================================================================== -->
     <section id="inicio" class="relative min-h-[96vh] flex items-center pt-28 pb-16 overflow-hidden">
-      <!-- Fotografía Principal Real de la Cuenta: CASA DE MARISCOS.jpg -->
-      <div class="absolute inset-0 z-0">
-        <img
-          id="heroBgImage"
-          src="CASA DE MARISCOS.jpg"
-          onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0B192C/D4A373?text=La+Casa+de+los+Mariscos+-+Ushuaia';"
-          alt="Fachada histórica de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
-          class="w-full h-full object-cover object-center animate-slow-zoom transition-all duration-700"
-        />
+      <!-- Fotografía Principal Real de la Cuenta: CASA DE MARISCOS.jpg (con efecto de movimiento) -->
+      <div class="absolute inset-0 z-0 overflow-hidden">
+        <div id="heroParallax" class="absolute -inset-[7%]">
+          <img
+            id="heroBgImage"
+            src="CASA DE MARISCOS.jpg"
+            onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0B192C/D4A373?text=La+Casa+de+los+Mariscos+-+Ushuaia';"
+            alt="Fachada histórica de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
+            class="w-full h-full object-cover object-center hero-motion"
+          />
+        </div>
         <!-- Degradados equilibrados para lectura editorial y visibilidad nítida de la fachada al desvanecer títulos -->
         <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/90 via-beagle-950/60 to-beagle-900/20"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-beagle-900 via-transparent to-beagle-950/45"></div>
@@ -866,16 +881,13 @@
           </ul>
         </div>
 
-        <!-- Columna 4: Código ZIP & Administración -->
+        <!-- Columna 4: Administración -->
         <div class="space-y-3 text-sm">
           <h5 class="font-serif text-base font-semibold text-copper-400 uppercase tracking-wider">Herramientas</h5>
           <p class="text-bone/65 text-xs leading-relaxed">
-            Descargá el paquete ZIP completo (HTML, CSS, JS, Three.js) o ingresá con clave 0608 para editar precios.
+            Ingresá con la clave 0608 para editar los precios de la carta en tiempo real.
           </p>
           <div class="flex flex-col gap-2.5 pt-1">
-            <button onclick="downloadProjectZip()" class="w-full py-2.5 px-4 rounded-xl bg-copper-500/20 border border-copper-500/50 hover:bg-copper-500/30 text-copper-400 font-semibold text-xs flex items-center justify-center gap-2 transition-all">
-              <i class="fa-solid fa-file-zipper"></i> Descargar ZIP Completo
-            </button>
             <button onclick="openAdminModal()" class="w-full py-2.5 px-4 rounded-xl bg-white/5 border border-white/15 hover:bg-white/10 text-bone font-semibold text-xs flex items-center justify-center gap-2 transition-all">
               <i class="fa-solid fa-lock text-copper-500"></i> Administrador (0608)
             </button>
@@ -1052,7 +1064,7 @@
   </div>
 
   <!-- =====================================================================
-       JAVASCRIPT: THREE.JS, CARTA COMPLETA, CARRITO, WHATSAPP, ADMIN Y ZIP
+       JAVASCRIPT: THREE.JS, MOVIMIENTO HERO, CARTA COMPLETA, CARRITO, WHATSAPP Y ADMIN
        ===================================================================== -->
   <script>
     const WHATSAPP_NUMBER = '5492901488405';
@@ -1202,6 +1214,7 @@
       initThreeJSBackground();
       init3SecondTitleCycle();
       initScrollReveal();
+      initHeroMotion();
     };
 
     function loadPersistedData() {
@@ -1240,6 +1253,42 @@
         dateInput.min = formatted;
         dateInput.value = formatted;
       }
+    }
+
+    /* ==========================================================================
+       MOVIMIENTO DE LA IMAGEN PRINCIPAL "CASA DE MARISCOS.jpg"
+       Parallax suave con el mouse + desplazamiento vertical al hacer scroll.
+       (La animación continua Ken Burns se define en CSS con .hero-motion)
+       ========================================================================== */
+    function initHeroMotion() {
+      const parallax = document.getElementById('heroParallax');
+      const hero = document.getElementById('inicio');
+      if (!parallax || !hero) return;
+
+      let targetX = 0, targetY = 0;
+      let curX = 0, curY = 0;
+      let scrollOffset = 0;
+
+      window.addEventListener('mousemove', (e) => {
+        targetX = (e.clientX / window.innerWidth - 0.5) * 2;
+        targetY = (e.clientY / window.innerHeight - 0.5) * 2;
+      }, { passive: true });
+
+      window.addEventListener('scroll', () => {
+        scrollOffset = window.scrollY || 0;
+      }, { passive: true });
+
+      function loop() {
+        curX += (targetX - curX) * 0.06;
+        curY += (targetY - curY) * 0.06;
+        const heroH = hero.offsetHeight || 1;
+        const scrollRatio = Math.min(scrollOffset / heroH, 1);
+        const px = curX * -18;
+        const py = curY * -12 + scrollRatio * 90;
+        parallax.style.transform = `translate3d(${px}px, ${py}px, 0)`;
+        requestAnimationFrame(loop);
+      }
+      loop();
     }
 
     /* Ciclo exacto de 3 segundos para desvanecer títulos y mostrar la foto real */
@@ -1873,35 +1922,6 @@
         toast.style.opacity = '0';
         setTimeout(() => toast.remove(), 300);
       }, 3400);
-    }
-
-    async function downloadProjectZip() {
-      if (typeof JSZip === 'undefined') return;
-      showToast('Generando paquete .ZIP con HTML, CSS, JavaScript y Three.js...', 'info');
-
-      try {
-        const zip = new JSZip();
-        const styleContent = document.querySelector('style')?.innerHTML || '';
-        const scriptContent = document.scripts[document.scripts.length - 1]?.innerHTML || '';
-
-        zip.file('index.html', '<!DOCTYPE html>\n' + document.documentElement.outerHTML);
-        zip.file('styles.css', `/* LA CASA DE LOS MARISCOS - USHUAIA */\n${styleContent.trim()}`);
-        zip.file('three-anim.js', `/* THREE.JS 3D SCENE */\n${initThreeJSBackground.toString()}\nwindow.addEventListener('load', initThreeJSBackground);`);
-        zip.file('app.js', `/* APP LOGIC */\n${scriptContent.trim()}`);
-        zip.file('README.md', '# La Casa de los Mariscos - Ushuaia\nColocá "CASA DE MARISCOS.jpg" junto a index.html.\nClave Admin: 0608\nUbicación: https://maps.app.goo.gl/6HYg1YcoDav3NHMd6');
-
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
-        link.download = 'La-Casa-de-los-Mariscos-Ushuaia.zip';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        showToast('¡ZIP descargado! Colocá "CASA DE MARISCOS.jpg" en la misma carpeta.', 'success');
-      } catch (err) {
-        showToast('No se pudo generar el ZIP.', 'error');
-      }
     }
   </script>
 </body>
