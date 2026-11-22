@@ -85,6 +85,7 @@
     /* ==========================================================================
        EFECTO DE MOVIMIENTO PARA LA IMAGEN PRINCIPAL "CASA DE MARISCOS.jpg"
        Ken Burns + deriva continua (el parallax con mouse/scroll se aplica por JS)
+       + BRILLO TOTAL: la imagen se muestra luminosa, sin velos de opacidad (0%)
        ========================================================================== */
     @keyframes heroCinematicDrift {
       0%   { transform: scale(1.06) translate3d(0, 0, 0); }
@@ -98,6 +99,8 @@
       animation: heroCinematicDrift 26s ease-in-out infinite;
       will-change: transform;
       backface-visibility: hidden;
+      /* BRILLO: imagen luminosa, saturada y viva */
+      filter: brightness(1.14) saturate(1.12) contrast(1.04);
     }
 
     #heroParallax {
@@ -274,10 +277,11 @@
 
   <main>
     <!-- =====================================================================
-         2. HERO SECTION FULL-BLEED CON "CASA DE MARISCOS.jpg" + MOVIMIENTO + TÍTULOS 3 SEG.
+         2. HERO SECTION FULL-BLEED CON "CASA DE MARISCOS.jpg" + MOVIMIENTO + BRILLO + TÍTULOS 3 SEG.
+         (Opacidad de velos a 0%: la imagen se muestra totalmente limpia y brillante)
          ===================================================================== -->
     <section id="inicio" class="relative min-h-[96vh] flex items-center pt-28 pb-16 overflow-hidden">
-      <!-- Fotografía Principal Real de la Cuenta: CASA DE MARISCOS.jpg (con efecto de movimiento) -->
+      <!-- Fotografía Principal Real de la Cuenta: CASA DE MARISCOS.jpg (con efecto de movimiento y brillo) -->
       <div class="absolute inset-0 z-0 overflow-hidden">
         <div id="heroParallax" class="absolute -inset-[7%]">
           <img
@@ -288,9 +292,7 @@
             class="w-full h-full object-cover object-center hero-motion"
           />
         </div>
-        <!-- Degradados sutiles para legibilidad sin ocultar la fachada -->
-        <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/40 via-transparent to-beagle-900/10"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-beagle-900/50 via-transparent to-beagle-950/20"></div>
+        <!-- OPACIDAD 0%: sin velos ni degradados sobre la imagen principal -->
       </div>
 
       <!-- Contenido Central del Hero -->
@@ -1213,7 +1215,7 @@
     /* ==========================================================================
        MOVIMIENTO DE LA IMAGEN PRINCIPAL "CASA DE MARISCOS.jpg"
        Parallax suave con el mouse + desplazamiento vertical al hacer scroll.
-       (La animación continua Ken Burns se define en CSS con .hero-motion)
+       (La animación continua Ken Burns y el BRILLO se definen en CSS con .hero-motion)
        ========================================================================== */
     function initHeroMotion() {
       const parallax = document.getElementById('heroParallax');
