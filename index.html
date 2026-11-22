@@ -17,27 +17,25 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
-  <!-- Three.js (r128) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
-  <!-- Configuración personalizada de Tailwind inspirada en Beagle & Copper -->
+  <!-- Configuración personalizada de Tailwind: Paleta Pastel Fueguina (rosa fachada + azul ventanal) -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
             beagle: {
-              950: '#07111F', // Azul abisal muy profundo
-              900: '#0B192C', // Azul marino profundo principal
-              800: '#132742', // Azul pizarra oscuro
-              700: '#1E3A5F', // Azul canal
+              950: '#FDF2F6', // Blush porcelana (superficies principales)
+              900: '#F8E3EC', // Rosa pastel de fondo (fachada)
+              800: '#F2D2DF', // Rosa pétalo (tarjetas)
+              700: '#E7BCD0', // Rosa profundo suave
             },
             copper: {
-              400: '#E2B686',
-              500: '#D4A373', // Cobre/dorado cálido principal
-              600: '#C88A55', // Cobre intenso hover
+              400: '#C9719A', // Rosa orquídea pastel (acentos de texto)
+              500: '#B45482', // Rosa frambuesa polvoriento (botones)
+              600: '#9E4370', // Frambuesa intensa hover
             },
-            bone: '#F8FAFC',    // Blanco hueso legible
+            powder: '#8FB4D2',   // Azul ventanal pastel (detalles)
+            bone: '#573C4B',     // Ciruela profunda (texto legible)
           },
           fontFamily: {
             serif: ['"Playfair Display"', 'Georgia', 'serif'],
@@ -64,23 +62,23 @@
 
   <style>
     /* ==========================================================================
-       ESTILOS PERSONALIZADOS, SCROLLING Y CICLO DE TÍTULOS DE 3 SEGUNDOS
+       ESTILOS PERSONALIZADOS PASTEL, SCROLLING Y CICLO DE TÍTULOS DE 3 SEGUNDOS
        ========================================================================== */
     body {
-      background-color: #0B192C;
-      color: #F8FAFC;
+      background-color: #F8E3EC;
+      color: #573C4B;
       overflow-x: hidden;
     }
 
-    /* Barra de desplazamiento personalizada */
+    /* Barra de desplazamiento personalizada pastel */
     ::-webkit-scrollbar {
       width: 8px;
     }
     ::-webkit-scrollbar-track {
-      background: #07111F;
+      background: #F2D2DF;
     }
     ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #D4A373, #C88A55);
+      background: linear-gradient(180deg, #C9719A, #8FB4D2);
       border-radius: 9999px;
     }
 
@@ -110,17 +108,9 @@
       .hero-motion { animation: none; }
     }
 
-    /* Lienzo 3D Three.js */
-    #three-canvas-container {
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Fondo de secciones con la foto auténtica CASA DE MARISCOS.jpg */
+    /* Fondo de secciones con la foto auténtica CASA DE MARISCOS.jpg (velo pastel) */
     .section-bg-facade {
-      background-image: linear-gradient(to bottom, rgba(7, 17, 31, 0.91), rgba(11, 25, 44, 0.86), rgba(7, 17, 31, 0.95)), url('CASA DE MARISCOS.jpg');
+      background-image: linear-gradient(to bottom, rgba(253, 242, 246, 0.93), rgba(248, 227, 236, 0.90), rgba(253, 242, 246, 0.95)), url('CASA DE MARISCOS.jpg');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -153,13 +143,13 @@
       pointer-events: none;
     }
 
-    /* Tarjetas Glassmorphism estilo Beagle */
+    /* Tarjetas Glassmorphism pastel estilo Blush */
     .glass-beagle {
-      background: rgba(19, 39, 66, 0.68);
+      background: rgba(255, 250, 252, 0.66);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 0 20px 45px -15px rgba(7, 17, 31, 0.75);
+      border: 1px solid rgba(180, 84, 130, 0.18);
+      box-shadow: 0 20px 45px -18px rgba(180, 84, 130, 0.25);
     }
 
     /* Revelado suave al hacer scroll */
@@ -185,14 +175,11 @@
 </head>
 
 <body class="bg-beagle-900 text-bone font-sans antialiased selection:bg-copper-500 selection:text-beagle-950 overflow-x-hidden">
-  <!-- Canvas Interactivo 3D Three.js -->
-  <div id="three-canvas-container" aria-hidden="true"></div>
-
   <!-- Notificaciones Toast (Reemplaza alert()) -->
   <div id="toast-container" class="fixed top-24 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
 
   <!-- =====================================================================
-       1. BARRA DE NAVEGACIÓN SUPERIOR (ESTILO BRÚJULA AUSTRAL BEAGLE & COPPER)
+       1. BARRA DE NAVEGACIÓN SUPERIOR (ESTILO BRÚJULA AUSTRAL PASTEL)
        ===================================================================== -->
   <header id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-500 border-b border-white/10 bg-beagle-950/80 backdrop-blur-md">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -296,12 +283,12 @@
           <img
             id="heroBgImage"
             src="CASA DE MARISCOS.jpg"
-            onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0B192C/D4A373?text=La+Casa+de+los+Mariscos+-+Ushuaia';"
+            onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/F8E3EC/B45482?text=La+Casa+de+los+Mariscos+-+Ushuaia';"
             alt="Fachada histórica de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
             class="w-full h-full object-cover object-center hero-motion"
           />
         </div>
-        <!-- Degradados equilibrados para lectura editorial y visibilidad nítida de la fachada al desvanecer títulos -->
+        <!-- Degradados pastel equilibrados para lectura editorial y visibilidad nítida de la fachada -->
         <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/90 via-beagle-950/60 to-beagle-900/20"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-beagle-900 via-transparent to-beagle-950/45"></div>
       </div>
@@ -320,11 +307,11 @@
 
           <!-- Bloque de Títulos Dinámicos (Desaparecen cada 3 segundos para apreciar la foto de fondo) -->
           <div class="dynamic-title-cycle title-visible">
-            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-semibold text-bone leading-[1.08] tracking-tight drop-shadow-[0_6px_24px_rgba(0,0,0,0.85)]">
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-semibold text-bone leading-[1.08] tracking-tight drop-shadow-[0_6px_24px_rgba(253,242,246,0.85)]">
               La Casa de los <span class="italic font-normal text-copper-400">Mariscos</span>
             </h1>
 
-            <p class="mt-5 text-base sm:text-lg md:text-xl text-bone/90 font-light leading-relaxed max-w-2xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+            <p class="mt-5 text-base sm:text-lg md:text-xl text-bone/90 font-light leading-relaxed max-w-2xl drop-shadow-[0_2px_12px_rgba(253,242,246,0.9)]">
               El sabor auténtico del Fin del Mundo. Centolla entera del Canal Beagle, cazuelas artesanales, merluza negra y comida casera fueguina en nuestra emblemática casa de Av. San Martín 232.
             </p>
           </div>
@@ -904,7 +891,7 @@
 
   <!-- Botón Flotante de Pedido Rápido -->
   <div class="fixed bottom-5 right-5 z-30">
-    <button onclick="toggleCartDrawer(true)" class="px-5 py-3.5 rounded-full bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-xs sm:text-sm shadow-2xl shadow-beagle-950 flex items-center gap-2.5 transition-all">
+    <button onclick="toggleCartDrawer(true)" class="px-5 py-3.5 rounded-full bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-xs sm:text-sm shadow-2xl shadow-copper-500/40 flex items-center gap-2.5 transition-all">
       <i class="fa-solid fa-bag-shopping text-base"></i>
       <span>Mi Pedido (<span id="floating-cart-count">0</span>)</span>
     </button>
@@ -1041,7 +1028,7 @@
         <i class="fa-solid fa-xmark text-lg"></i>
       </button>
       <div class="rounded-2xl overflow-hidden border border-copper-500/35 bg-beagle-900 shadow-2xl">
-        <div class="h-[55vh] sm:h-[68vh] overflow-hidden bg-black flex items-center justify-center">
+        <div class="h-[55vh] sm:h-[68vh] overflow-hidden bg-beagle-800 flex items-center justify-center">
           <img id="lightbox-img" src="CASA DE MARISCOS.jpg" alt="Vista ampliada" class="w-full h-full object-cover transition-all duration-500" />
         </div>
         <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-beagle-950">
@@ -1064,7 +1051,7 @@
   </div>
 
   <!-- =====================================================================
-       JAVASCRIPT: THREE.JS, MOVIMIENTO HERO, CARTA COMPLETA, CARRITO, WHATSAPP Y ADMIN
+       JAVASCRIPT: MOVIMIENTO HERO, CARTA COMPLETA, CARRITO, WHATSAPP Y ADMIN
        ===================================================================== -->
   <script>
     const WHATSAPP_NUMBER = '5492901488405';
@@ -1211,7 +1198,6 @@
       renderCategoryTabs();
       renderMenu();
       renderCart();
-      initThreeJSBackground();
       init3SecondTitleCycle();
       initScrollReveal();
       initHeroMotion();
@@ -1315,93 +1301,6 @@
         { threshold: 0.12 }
       );
       document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
-    }
-
-    /* Escena 3D Three.js inspirada en las aguas del Canal Beagle y destellos Cobre */
-    function initThreeJSBackground() {
-      const container = document.getElementById('three-canvas-container');
-      if (!container || typeof THREE === 'undefined') return;
-
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.z = 35;
-
-      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      container.appendChild(renderer.domElement);
-
-      const particleCount = 170;
-      const geometry = new THREE.BufferGeometry();
-      const positions = new Float32Array(particleCount * 3);
-      const colors = new Float32Array(particleCount * 3);
-
-      const palette = [
-        new THREE.Color('#D4A373'), // Copper 500
-        new THREE.Color('#E2B686'), // Copper 400
-        new THREE.Color('#38BDF8'), // Canal Beagle
-        new THREE.Color('#F8FAFC')  // Bone
-      ];
-
-      for (let i = 0; i < particleCount; i++) {
-        positions[i * 3] = (Math.random() - 0.5) * 90;
-        positions[i * 3 + 1] = (Math.random() - 0.5) * 70;
-        positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
-
-        const color = palette[i % palette.length];
-        colors[i * 3] = color.r;
-        colors[i * 3 + 1] = color.g;
-        colors[i * 3 + 2] = color.b;
-      }
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-      const material = new THREE.PointsMaterial({
-        size: 0.42,
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.6
-      });
-
-      const particles = new THREE.Points(geometry, material);
-      scene.add(particles);
-
-      const waveGeo = new THREE.TorusKnotGeometry(12, 2.4, 90, 12);
-      const waveMat = new THREE.MeshBasicMaterial({
-        color: 0xD4A373,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.045
-      });
-      const oceanKnot = new THREE.Mesh(waveGeo, waveMat);
-      oceanKnot.position.set(14, -4, -12);
-      scene.add(oceanKnot);
-
-      let mouseX = 0;
-      let mouseY = 0;
-      window.addEventListener('mousemove', (e) => {
-        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-      }, { passive: true });
-
-      window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
-      });
-
-      const clock = new THREE.Clock();
-      function animate() {
-        requestAnimationFrame(animate);
-        const elapsed = clock.getElapsedTime();
-        particles.rotation.y = elapsed * 0.04 + mouseX * 0.15;
-        particles.rotation.x = Math.sin(elapsed * 0.15) * 0.08 + mouseY * 0.1;
-        oceanKnot.rotation.x = elapsed * 0.08;
-        oceanKnot.rotation.y = elapsed * 0.11;
-        renderer.render(scene, camera);
-      }
-      animate();
     }
 
     function formatARS(value) {
@@ -1908,8 +1807,8 @@
       if (!container) return;
 
       const styles = {
-        success: 'border-emerald-400/50 bg-beagle-950/95 text-emerald-200',
-        error: 'border-rose-400/50 bg-beagle-950/95 text-rose-200',
+        success: 'border-emerald-300/70 bg-beagle-950/95 text-emerald-700',
+        error: 'border-rose-300/70 bg-beagle-950/95 text-rose-600',
         info: 'border-copper-500/50 bg-beagle-950/95 text-bone'
       };
 
