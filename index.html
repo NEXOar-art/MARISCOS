@@ -1,45 +1,1908 @@
-<!doctype html>
-<html lang="es">
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f7f0e5">
-  <meta name="description" content="La Guada — parrilla argentina en San Fernando del Valle de Catamarca. Reservá tu mesa y disfrutá el ritual del fuego.">
-  <title>La Guada — Parrilla de barrio, fuego de siempre</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <script type="importmap">
-    {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.187.0/build/three.module.js"}}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>La Casa de los Mariscos | Ushuaia · Patagonia</title>
+  <meta name="description" content="Marisquería tradicional en Av. San Martín 232, Ushuaia. Centolla fueguina entera, cazuelas del Canal Beagle, merluza negra y comida casera." />
+
+  <!-- Tipografías Google Fonts: Playfair Display (Serif editorial) & Plus Jakarta Sans (Sans-serif moderno) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- Three.js (r128) & JSZip para descarga modular en ZIP -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
+  <!-- Configuración personalizada de Tailwind inspirada en Beagle & Copper -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            beagle: {
+              950: '#07111F', // Azul abisal muy profundo
+              900: '#0B192C', // Azul marino profundo principal
+              800: '#132742', // Azul pizarra oscuro
+              700: '#1E3A5F', // Azul canal
+            },
+            copper: {
+              400: '#E2B686',
+              500: '#D4A373', // Cobre/dorado cálido principal
+              600: '#C88A55', // Cobre intenso hover
+            },
+            bone: '#F8FAFC',    // Blanco hueso legible
+          },
+          fontFamily: {
+            serif: ['"Playfair Display"', 'Georgia', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'slow-zoom': 'slowZoom 22s ease-in-out infinite alternate',
+            'fade-up': 'fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            slowZoom: {
+              '0%': { transform: 'scale(1)' },
+              '100%': { transform: 'scale(1.07)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(24px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            }
+          }
+        }
+      }
+    };
   </script>
+
+  <style>
+    /* ==========================================================================
+       ESTILOS PERSONALIZADOS, SCROLLING Y CICLO DE TÍTULOS DE 3 SEGUNDOS
+       ========================================================================== */
+    body {
+      background-color: #0B192C;
+      color: #F8FAFC;
+      overflow-x: hidden;
+    }
+
+    /* Barra de desplazamiento personalizada */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #07111F;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #D4A373, #C88A55);
+      border-radius: 9999px;
+    }
+
+    /* Lienzo 3D Three.js */
+    #three-canvas-container {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Fondo de secciones con la foto auténtica CASA DE MARISCOS.jpg */
+    .section-bg-facade {
+      background-image: linear-gradient(to bottom, rgba(7, 17, 31, 0.91), rgba(11, 25, 44, 0.86), rgba(7, 17, 31, 0.95)), url('CASA DE MARISCOS.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+
+    @media (max-width: 768px) {
+      .section-bg-facade {
+        background-attachment: scroll;
+      }
+    }
+
+    /* Ciclo de visibilidad cada 3 segundos (3s visible -> 3s tenue para lucir la foto real) */
+    .dynamic-title-cycle {
+      transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+                  filter 0.85s ease;
+      will-change: opacity, transform;
+    }
+
+    .dynamic-title-cycle.title-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0px);
+    }
+
+    .dynamic-title-cycle.title-hidden {
+      opacity: 0.05;
+      transform: translateY(-14px) scale(0.97);
+      filter: blur(3px);
+      pointer-events: none;
+    }
+
+    /* Tarjetas Glassmorphism estilo Beagle */
+    .glass-beagle {
+      background: rgba(19, 39, 66, 0.68);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 20px 45px -15px rgba(7, 17, 31, 0.75);
+    }
+
+    /* Revelado suave al hacer scroll */
+    .reveal-on-scroll {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .reveal-on-scroll.revealed {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
 </head>
-<body>
-  <div class="announcement"><span class="announcement-dot"></span> PARRILLA ARGENTINA · SAN FERNANDO DEL VALLE DE CATAMARCA</div>
-  <header class="site-header">
-    <a class="wordmark" href="#inicio" aria-label="La Guada, inicio"><span class="brand-stamp">LG</span><span>la guada<small>parrilla de barrio</small></span></a>
-    <nav aria-label="Navegación principal"><a href="#historia">La casa</a><a href="#sabores">El ritual</a><a href="#visitanos">Cómo llegar</a><a class="nav-reserve" href="#reservas">Guardame un lugar <span>↗</span></a></nav>
-  </header>
-  <main>
-    <section class="hero" id="inicio">
-      <div class="hero-copy"><span class="kicker"><i></i> Catamarca, Argentina · Desde siempre</span><h1>La mesa<br>está <em>servida.</em></h1><p>Brasas encendidas, una charla que se alarga y ese primer bocado que hace que todo lo demás espere.</p><div class="hero-links"><a class="pill-button" href="#reservas">Reservá tu mesa <span>↗</span></a><a class="under-link" href="#historia">Conocé La Guada <span>↓</span></a></div><div class="hero-proof"><span class="proof-number">1.257</span><span>personas dejaron<br>su opinión</span><span class="proof-divider"></span><span class="proof-price">$30–40 mil<small>por persona</small></span></div></div>
-      <div class="hero-art" aria-label="Fachada de La Guada en San Fernando del Valle de Catamarca">
-        <img class="hero-photo" src="LAGUADA.jpg" alt="Frente de La Guada, con su entrada iluminada por la noche" fetchpriority="high">
-        <div class="art-topline"><span>ASÍ SE VE LA GUADA</span><span>CATAMARCA · ARGENTINA</span></div>
-        <canvas id="fire-scene" aria-hidden="true"></canvas>
-        <div class="art-sticker"><span>ACÁ<br>NOS VEMOS</span><b>✳</b></div>
-        <div class="art-caption"><span>LA GUADA · AYACUCHO 769</span><span>El fuego nos reúne.</span></div>
+
+<body class="bg-beagle-900 text-bone font-sans antialiased selection:bg-copper-500 selection:text-beagle-950 overflow-x-hidden">
+  <!-- Canvas Interactivo 3D Three.js -->
+  <div id="three-canvas-container" aria-hidden="true"></div>
+
+  <!-- Notificaciones Toast (Reemplaza alert()) -->
+  <div id="toast-container" class="fixed top-24 right-4 z-50 flex flex-col gap-2 max-w-sm w-full pointer-events-none"></div>
+
+  <!-- =====================================================================
+       1. BARRA DE NAVEGACIÓN SUPERIOR (ESTILO BRÚJULA AUSTRAL BEAGLE & COPPER)
+       ===================================================================== -->
+  <header id="navbar" class="fixed top-0 left-0 right-0 z-40 transition-all duration-500 border-b border-white/10 bg-beagle-950/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20 md:h-24">
+
+        <!-- Logo Elegante con Emblema de Brújula Austral -->
+        <a href="#inicio" class="group flex items-center gap-3.5 focus:outline-none">
+          <div class="w-10 h-10 md:w-11 md:h-11 rounded-full border border-copper-500/60 flex items-center justify-center bg-beagle-900/90 group-hover:border-copper-400 transition-colors shrink-0">
+            <svg class="w-5 h-5 text-copper-500 group-hover:rotate-12 transition-transform duration-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke-linecap="round"/>
+              <path d="M8.5 14.5c1.5-1.5 2.5-1.5 3.5 0s2 1.5 3.5 0" stroke-linecap="round"/>
+              <polygon points="12,7 13.5,12 12,13.5 10.5,12" fill="currentColor" stroke="none"/>
+            </svg>
+          </div>
+          <div class="flex flex-col">
+            <span class="font-serif text-base sm:text-xl md:text-2xl tracking-wider text-bone font-semibold leading-none">
+              LA CASA DE LOS MARISCOS
+            </span>
+            <span class="text-[10px] sm:text-[11px] uppercase tracking-[0.28em] text-copper-500 mt-1.5 font-medium">
+              Ushuaia · Patagonia
+            </span>
+          </div>
+        </a>
+
+        <!-- Enlaces de Navegación (Desktop) -->
+        <nav class="hidden lg:flex items-center gap-7 text-sm font-medium tracking-wide text-bone/85">
+          <a href="#experiencia" class="hover:text-copper-400 transition-colors py-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-copper-500 hover:after:w-full after:transition-all">
+            Nuestra Casa
+          </a>
+          <a href="#galeria" class="hover:text-copper-400 transition-colors py-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-copper-500 hover:after:w-full after:transition-all">
+            Galería (5)
+          </a>
+          <a href="#carta" class="hover:text-copper-400 transition-colors py-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-copper-500 hover:after:w-full after:transition-all">
+            La Carta
+          </a>
+          <a href="#reservas" class="hover:text-copper-400 transition-colors py-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-copper-500 hover:after:w-full after:transition-all">
+            Reservas
+          </a>
+          <a href="#ubicacion" class="hover:text-copper-400 transition-colors py-2 relative after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-copper-500 hover:after:w-full after:transition-all">
+            Ubicación
+          </a>
+        </nav>
+
+        <!-- Controles: Descargar ZIP, Admin (0608), Carrito WhatsApp y Menú Móvil -->
+        <div class="flex items-center gap-2 sm:gap-2.5">
+          <!-- Descargar ZIP del Proyecto -->
+          <button
+            onclick="downloadProjectZip()"
+            title="Descargar proyecto completo en ZIP (HTML, CSS, JS, Three.js)"
+            class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium border border-white/15 bg-white/5 text-bone/85 hover:bg-white/10 hover:text-copper-400 transition-all">
+            <i class="fa-solid fa-file-zipper text-copper-500"></i>
+            <span class="hidden xl:inline">ZIP</span>
+          </button>
+
+          <!-- Botón Administrador (Clave 0608) -->
+          <button
+            onclick="openAdminModal()"
+            title="Panel Administrador para editar precios (Clave: 0608)"
+            class="p-2.5 sm:px-3 sm:py-2 rounded-lg text-xs font-medium border border-white/15 bg-white/5 text-bone/85 hover:bg-white/10 hover:text-copper-400 transition-all flex items-center gap-1.5">
+            <i id="admin-lock-icon" class="fa-solid fa-lock text-copper-500"></i>
+            <span class="hidden xl:inline">Admin</span>
+          </button>
+
+          <!-- Carrito de Compras -->
+          <button
+            onclick="toggleCartDrawer(true)"
+            class="px-3.5 py-2.5 sm:px-5 sm:py-2.5 rounded-lg bg-copper-500 hover:bg-copper-600 text-beagle-950 font-semibold text-xs sm:text-sm tracking-wide transition-all duration-300 shadow-lg shadow-copper-500/20 flex items-center gap-2">
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span class="hidden sm:inline">Pedido</span>
+            <span id="cart-badge" class="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-beagle-950 text-copper-400 text-[11px] font-bold">0</span>
+          </button>
+
+          <!-- Botón Menú Móvil -->
+          <button
+            onclick="toggleMobileMenu()"
+            aria-label="Abrir menú"
+            class="lg:hidden p-2.5 rounded-lg border border-white/15 text-bone hover:bg-white/10 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+          </button>
+        </div>
       </div>
-      <div class="hero-side-label">BUENOS MOMENTOS, SIN PRISA</div>
+    </div>
+
+    <!-- Menú Desplegable Móvil -->
+    <div id="mobileMenu" class="hidden lg:hidden bg-beagle-950/95 backdrop-blur-xl border-b border-white/10 px-6 pt-4 pb-6 space-y-3">
+      <a href="#experiencia" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Nuestra Casa</a>
+      <a href="#galeria" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Galería (5 Fotos Reales)</a>
+      <a href="#carta" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">La Carta & Buscador</a>
+      <a href="#reservas" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Reservar Mesa</a>
+      <a href="#ubicacion" onclick="toggleMobileMenu()" class="block py-2 text-base font-medium text-bone/90 hover:text-copper-400">Ubicación & Mapa</a>
+      <div class="pt-3 border-t border-white/10 flex gap-2">
+        <button onclick="downloadProjectZip(); toggleMobileMenu();" class="flex-1 py-2.5 px-3 rounded-lg bg-copper-500/20 border border-copper-500/40 text-copper-400 text-xs font-semibold">
+          <i class="fa-solid fa-file-zipper mr-1"></i> Descargar ZIP
+        </button>
+        <button onclick="openAdminModal(); toggleMobileMenu();" class="flex-1 py-2.5 px-3 rounded-lg bg-white/5 border border-white/15 text-bone text-xs font-semibold">
+          <i class="fa-solid fa-key text-copper-500 mr-1"></i> Admin (0608)
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- =====================================================================
+         2. HERO SECTION FULL-BLEED CON "CASA DE MARISCOS.jpg" + TÍTULOS 3 SEG.
+         ===================================================================== -->
+    <section id="inicio" class="relative min-h-[96vh] flex items-center pt-28 pb-16 overflow-hidden">
+      <!-- Fotografía Principal Real de la Cuenta: CASA DE MARISCOS.jpg -->
+      <div class="absolute inset-0 z-0">
+        <img
+          id="heroBgImage"
+          src="CASA DE MARISCOS.jpg"
+          onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/0B192C/D4A373?text=La+Casa+de+los+Mariscos+-+Ushuaia';"
+          alt="Fachada histórica de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
+          class="w-full h-full object-cover object-center animate-slow-zoom transition-all duration-700"
+        />
+        <!-- Degradados equilibrados para lectura editorial y visibilidad nítida de la fachada al desvanecer títulos -->
+        <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/90 via-beagle-950/60 to-beagle-900/20"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-beagle-900 via-transparent to-beagle-950/45"></div>
+      </div>
+
+      <!-- Contenido Central del Hero -->
+      <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+        <div class="max-w-3xl animate-fade-up">
+
+          <!-- Badge de Coordenadas y Calificación Real Google Maps (Siempre visible) -->
+          <div class="inline-flex flex-wrap items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-beagle-950/80 border border-copper-500/40 backdrop-blur-md mb-6 shadow-lg">
+            <span class="w-1.5 h-1.5 rounded-full bg-copper-500 animate-pulse"></span>
+            <span class="text-[11px] sm:text-xs font-medium uppercase tracking-[0.18em] text-copper-400">
+              Av. San Martín 232 · Ushuaia · 4.5 ★ (3.963 reseñas)
+            </span>
+          </div>
+
+          <!-- Bloque de Títulos Dinámicos (Desaparecen cada 3 segundos para apreciar la foto de fondo) -->
+          <div class="dynamic-title-cycle title-visible">
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-semibold text-bone leading-[1.08] tracking-tight drop-shadow-[0_6px_24px_rgba(0,0,0,0.85)]">
+              La Casa de los <span class="italic font-normal text-copper-400">Mariscos</span>
+            </h1>
+
+            <p class="mt-5 text-base sm:text-lg md:text-xl text-bone/90 font-light leading-relaxed max-w-2xl drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+              El sabor auténtico del Fin del Mundo. Centolla entera del Canal Beagle, cazuelas artesanales, merluza negra y comida casera fueguina en nuestra emblemática casa de Av. San Martín 232.
+            </p>
+          </div>
+
+          <!-- Llamadas a la Acción (CTAs) -->
+          <div class="mt-9 flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+            <a
+              href="#carta"
+              class="px-8 py-4 rounded-xl bg-copper-500 hover:bg-copper-600 text-beagle-950 font-semibold text-sm sm:text-base tracking-wide transition-all duration-300 shadow-xl shadow-copper-500/25 flex items-center justify-center gap-2.5 group">
+              <span>Pedir en Línea (Carta)</span>
+              <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+
+            <a
+              href="#reservas"
+              class="px-8 py-4 rounded-xl bg-beagle-950/60 hover:bg-beagle-900/90 text-bone border border-white/25 hover:border-copper-500/60 backdrop-blur-md font-medium text-sm sm:text-base tracking-wide transition-all duration-300 flex items-center justify-center gap-2">
+              <i class="fa-regular fa-calendar-check text-copper-400"></i>
+              <span>Reservar una Mesa</span>
+            </a>
+          </div>
+
+          <!-- Información Permanente del Local (Datos de Google Maps) -->
+          <div class="mt-12 pt-7 border-t border-white/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            <div class="flex flex-wrap items-center gap-5 sm:gap-7 text-xs sm:text-sm text-bone/90 bg-beagle-950/65 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10">
+              <div>
+                <span class="block text-copper-400 font-serif text-base font-semibold">Marisquería · (3.963)</span>
+                <span class="text-bone/75">Rango: $ 30.000 - 70.000</span>
+              </div>
+              <div class="h-8 w-[1px] bg-white/15"></div>
+              <div>
+                <span class="block text-copper-400 font-serif text-base font-semibold">Av. San Martín 232</span>
+                <span class="text-bone/75">V9410 Ushuaia, Tierra del Fuego</span>
+              </div>
+            </div>
+
+            <!-- Accesos directos estilo ficha de Google Maps -->
+            <div class="flex flex-wrap items-center gap-2 bg-beagle-950/80 p-1.5 rounded-xl border border-white/15 backdrop-blur-md self-start lg:self-auto">
+              <a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-copper-500 text-beagle-950 hover:bg-copper-400 transition-all">
+                Cómo llegar
+              </a>
+              <button onclick="saveRestaurantBookmark()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
+                Guardar
+              </button>
+              <button onclick="copyLocationLink()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
+                Enviar al teléfono
+              </button>
+              <button onclick="shareRestaurant()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
+                Compartir
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </section>
-    <div class="ticker" aria-label="Parrilla argentina, encuentro y sobremesa"><div class="ticker-track"><span>PARA COMPARTIR</span><b>✳</b><span>HECHO A LAS BRASAS</span><b>✳</b><span>UNA MESA LARGA</span><b>✳</b><span>LA SOBREMESA</span><b>✳</b><span>PARA COMPARTIR</span><b>✳</b><span>HECHO A LAS BRASAS</span><b>✳</b><span>UNA MESA LARGA</span><b>✳</b><span>LA SOBREMESA</span><b>✳</b></div></div>
-    <section class="story section-pad" id="historia"><div class="story-photo reveal"><img src="https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=1100&q=85" alt="Carne recién salida de la parrilla"><span class="photo-tag">AL CALOR DE LAS BRASAS</span><span class="photo-index">CATAMARCA · ARG.</span></div><div class="story-copy reveal"><span class="kicker"><i></i> Una mesa, muchas historias</span><h2>El fuego junta.<br>La mesa <em>acerca.</em></h2><p>En La Guada, la parrilla es el comienzo. Lo que sigue es de ustedes: reencontrarse, celebrar, pedir un poco más de pan y quedarse un ratito más.</p><p>Un lugar para disfrutar los sabores de siempre en San Fernando del Valle de Catamarca.</p><div class="story-signature">Nos vemos alrededor del fuego <span>— La Guada</span></div><div class="story-stats"><div><b>+1.257</b><small>opiniones</small></div><div><b>$30–40 mil</b><small>por persona</small></div><div><b>Catamarca</b><small>nuestro lugar</small></div></div></div></section>
-    <section class="ritual section-pad" id="sabores"><div class="section-intro reveal"><div><span class="kicker"><i></i> El ritual de venir</span><h2>Más que comer.<br><em>Encontrarse.</em></h2></div><p>Hay cosas que saben mejor cuando se comparten. Prepará el apetito; del resto nos encargamos entre todos.</p></div><div class="ritual-grid"><article class="ritual-card card-large reveal"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=1100&q=85" alt="Cortes argentinos cocinándose a las brasas"><div class="card-meta"><span>01 · EL CENTRO DE LA MESA</span><span>✳</span></div><div class="card-copy"><h3>La parrilla</h3><p>Buenas brasas, tiempo y sabor de verdad.</p></div></article><article class="ritual-card card-small sage-card reveal"><span class="card-doodle">✳</span><div class="card-meta"><span>02 · LO QUE VA AL MEDIO</span><span>✳</span></div><div class="card-copy"><h3>Algo para compartir</h3><p>Que nadie se quede con las ganas.</p></div><span class="hand-note">pedimos<br>otra ronda <b>↗</b></span></article><article class="ritual-card card-small peach-card reveal"><img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" alt="Salón cálido para reunirse a comer"><div class="card-shade"></div><div class="card-meta"><span>03 · QUEDARSE UN POCO MÁS</span><span>✳</span></div><div class="card-copy"><h3>La sobremesa</h3><p>El mejor plan no mira el reloj.</p></div></article></div></section>
-    <section class="reservation" id="reservas"><div class="reservation-scribble" aria-hidden="true">nos vemos</div><div class="reservation-inner"><div class="reservation-copy reveal"><span class="kicker"><i></i> Tu lugar está por acá</span><h2>El próximo<br>brindis <em>es tuyo.</em></h2><p>Completá tus datos y te llevamos a WhatsApp con el mensaje listo. La confirmación de disponibilidad la hacemos por ahí.</p><div class="reservation-points"><span><b>✳</b> Elegí el día que te gustaría venir</span><span><b>✳</b> Te respondemos directo por WhatsApp</span><span><b>✳</b> Ayacucho 769, Catamarca</span></div></div><form class="booking-card reveal" id="booking-form"><div class="form-heading"><span>01 — RESERVAS</span><span class="form-flower">✳</span></div><h3>Contanos de tu visita.</h3><p>Los campos con * son necesarios.</p><div class="form-grid"><label class="field field-wide"><span>Nombre y apellido <b>*</b></span><input id="name" name="name" type="text" placeholder="Tu nombre completo" autocomplete="name" required></label><label class="field"><span>Día y fecha <b>*</b></span><input id="date" name="date" type="date" required></label><label class="field"><span>Asistentes <b>*</b></span><select id="guests" name="guests" required><option value="">¿Cuántos vienen?</option><option>1 persona</option><option>2 personas</option><option>3 personas</option><option>4 personas</option><option>5 personas</option><option>6 personas</option><option>7 personas</option><option>8 personas</option><option>9 o más personas</option></select></label><label class="field field-wide"><span>E-mail <small>opcional</small></span><input id="email" name="email" type="email" placeholder="tu@email.com" autocomplete="email"></label></div><button class="submit-button" type="submit">Preparar mensaje en WhatsApp <span>↗</span></button><div class="form-foot"><span>Tu reserva se consulta directamente con el restaurante.</span><span>✳</span></div></form></div></section>
-    <section class="visit section-pad" id="visitanos"><div class="visit-top reveal"><div><span class="kicker"><i></i> Estamos en San Fernando</span><h2>Dobla por acá.<br><em>Te esperamos.</em></h2></div><a class="pill-button dark-button" href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Cómo llegar <span>↗</span></a></div><div class="visit-grid"><div class="map-wrap reveal"><iframe title="Mapa para llegar a La Guada, Catamarca" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://maps.google.com/maps?q=Ayacucho%20769%2C%20San%20Fernando%20del%20Valle%20de%20Catamarca%2C%20Argentina&output=embed"></iframe><a class="map-open" href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Abrir en Google Maps ↗</a></div><aside class="contact-card reveal"><span class="contact-flower">✳</span><span class="kicker"><i></i> A mano</span><h3>Un mensaje<br>y nos vemos.</h3><div class="contact-row"><span>VISITANOS</span><a href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Ayacucho 769, K4700FVJ<br>San Fernando del Valle de Catamarca ↗</a></div><div class="contact-row"><span>LLAMANOS</span><a href="tel:+543834033990">0383 403-3990 ↗</a></div><div class="contact-row"><span>HORARIOS</span><span>Consultanos por WhatsApp para confirmar horarios y disponibilidad.</span></div><a class="social-link" href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener">Encontranos en Facebook <span>↗</span></a></aside></div></section>
+
+    <!-- =====================================================================
+         3. NUESTRA CASA Y TRADICIÓN FUEGUINA (CON FONDO REAL DE LA CUENTA)
+         ===================================================================== -->
+    <section id="experiencia" class="relative z-10 py-20 lg:py-28 section-bg-facade border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-14 gap-6">
+          <div class="dynamic-title-cycle title-visible">
+            <span class="text-xs font-semibold uppercase tracking-[0.25em] text-copper-500">
+              Identidad Culinaria · Desde el Fin del Mundo
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-bone font-semibold mt-3">
+              Tradición del <span class="italic font-normal text-copper-400">Canal Beagle</span>
+            </h2>
+          </div>
+          <p class="text-bone/75 text-sm sm:text-base max-w-md leading-relaxed">
+            En Av. San Martín 232 recibimos a quienes visitan Ushuaia con frutos de mar frescos, cazuelas caseras y la calidez de nuestra historia patagónica.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 reveal-on-scroll">
+          <div class="glass-beagle rounded-2xl p-7 hover:border-copper-500/45 transition-all">
+            <div class="w-12 h-12 rounded-xl bg-copper-500/15 border border-copper-500/40 flex items-center justify-center text-copper-400 text-xl mb-5">
+              <i class="fa-solid fa-shrimp"></i>
+            </div>
+            <h3 class="font-serif text-2xl text-bone font-semibold">Centolla Entera & Cazuelas</h3>
+            <p class="text-bone/75 text-sm mt-3 leading-relaxed">
+              Especialistas en centolla fueguina al natural, gratinada a la parmesana, a la provenzal y en nuestras reconocidas cazuelas de mariscos.
+            </p>
+          </div>
+
+          <div class="glass-beagle rounded-2xl p-7 hover:border-copper-500/45 transition-all">
+            <div class="w-12 h-12 rounded-xl bg-copper-500/15 border border-copper-500/40 flex items-center justify-center text-copper-400 text-xl mb-5">
+              <i class="fa-solid fa-fish"></i>
+            </div>
+            <h3 class="font-serif text-2xl text-bone font-semibold">Merluza Negra & Trucha</h3>
+            <p class="text-bone/75 text-sm mt-3 leading-relaxed">
+              Pescados australes de aguas profundas, pastas caseras como los Tallarines de la Abuela Eva y cordero patagónico de cocción lenta.
+            </p>
+          </div>
+
+          <div class="glass-beagle rounded-2xl p-7 hover:border-copper-500/45 transition-all">
+            <div class="w-12 h-12 rounded-xl bg-copper-500/15 border border-copper-500/40 flex items-center justify-center text-copper-400 text-xl mb-5">
+              <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <h3 class="font-serif text-2xl text-bone font-semibold">Salón, Llevar & Delivery</h3>
+            <p class="text-bone/75 text-sm mt-3 leading-relaxed">
+              Armá tu pedido en la carta indicando tu número de mesa en el salón, retiro para llevar o envío a domicilio directo por WhatsApp.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         4. GALERÍA DE 5 FOTOS REALES DE LA CUENTA (BENTO GRID INTERACTIVO)
+         ===================================================================== -->
+    <section id="galeria" class="relative z-10 py-20 lg:py-28 bg-beagle-900 border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Encabezado de la Galería -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div class="dynamic-title-cycle title-visible">
+            <span class="text-xs font-semibold uppercase tracking-[0.25em] text-copper-500">
+              Material Oficial · Google Maps & Instagram
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-bone font-semibold mt-3">
+              Cinco postales de <span class="italic font-normal text-copper-400">Nuestra Casa</span>
+            </h2>
+          </div>
+          <p class="text-bone/70 text-sm sm:text-base max-w-md leading-relaxed">
+            Imágenes reales de nuestra fachada en Av. San Martín 232 y los detalles que nos distinguen en Ushuaia. Tocá cualquier fotografía para ampliarla.
+          </p>
+        </div>
+
+        <!-- Bento Grid de 5 Fotos Auténticas -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 reveal-on-scroll">
+          <!-- FOTO 1 (PRINCIPAL - 7 COLUMNAS) -->
+          <article onclick="openLightbox(0)" class="group relative lg:col-span-7 h-[420px] sm:h-[510px] rounded-2xl overflow-hidden border border-white/10 bg-beagle-800 shadow-2xl cursor-pointer">
+            <img
+              src="CASA DE MARISCOS.jpg"
+              alt="Fachada principal de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
+              class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/30 to-transparent"></div>
+            <div class="absolute top-5 right-5 px-3.5 py-1.5 rounded-full bg-beagle-950/80 backdrop-blur-md border border-copper-500/40 text-xs font-medium text-copper-400">
+              01 / 05 · Foto Principal
+            </div>
+            <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
+              <span class="text-xs uppercase tracking-[0.2em] text-copper-400 font-medium">Av. San Martín 232 · Ushuaia</span>
+              <h3 class="font-serif text-2xl sm:text-3xl text-bone font-semibold mt-1">Fachada Histórica Fueguina</h3>
+              <p class="text-bone/80 text-sm mt-2">Nuestra emblemática casa rosada con ventanales azules y detalles marinos en pleno centro.</p>
+            </div>
+          </article>
+
+          <!-- COLUMNA DERECHA (5 COLUMNAS): FOTOS 2 Y 3 -->
+          <div class="lg:col-span-5 flex flex-col gap-6">
+            <!-- FOTO 2 -->
+            <article onclick="openLightbox(1)" class="group relative h-[243px] rounded-2xl overflow-hidden border border-white/10 bg-beagle-800 shadow-xl cursor-pointer">
+              <img
+                src="CASA DE MARISCOS.jpg"
+                alt="Cartel tradicional con centolla de La Casa de los Mariscos Ushuaia"
+                class="w-full h-full object-cover object-[22%_12%] scale-125 group-hover:scale-135 transition-transform duration-700 ease-out"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+              <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">02 / 05</div>
+              <div class="absolute bottom-0 left-0 right-0 p-5">
+                <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Insignia del Local</span>
+                <h3 class="font-serif text-xl text-bone font-semibold mt-0.5">Cartel Oficial de la Centolla</h3>
+              </div>
+            </article>
+
+            <!-- FOTO 3 -->
+            <article onclick="openLightbox(2)" class="group relative h-[243px] rounded-2xl overflow-hidden border border-white/10 bg-beagle-800 shadow-xl cursor-pointer">
+              <img
+                src="CASA DE MARISCOS.jpg"
+                alt="Pizarra Hay Centolla Entera en La Casa de los Mariscos"
+                class="w-full h-full object-cover object-[35%_58%] scale-150 group-hover:scale-165 transition-transform duration-700 ease-out"
+              />
+              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+              <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">03 / 05</div>
+              <div class="absolute bottom-0 left-0 right-0 p-5">
+                <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Pesca Fresca</span>
+                <h3 class="font-serif text-xl text-bone font-semibold mt-0.5">Pizarra "Hay Centolla Entera"</h3>
+              </div>
+            </article>
+          </div>
+
+          <!-- FILA INFERIOR: FOTOS 4 Y 5 -->
+          <article onclick="openLightbox(3)" class="group relative lg:col-span-6 h-[250px] rounded-2xl overflow-hidden border border-white/10 bg-beagle-800 shadow-xl cursor-pointer">
+            <img
+              src="CASA DE MARISCOS.jpg"
+              alt="Ventanales azules con siluetas de centolla y salón cálido"
+              class="w-full h-full object-cover object-[76%_55%] scale-135 group-hover:scale-145 transition-transform duration-700 ease-out"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+            <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">04 / 05</div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Salón & Calidez</span>
+              <h3 class="font-serif text-xl sm:text-2xl text-bone font-semibold mt-0.5">Ventanales Azules y Salón Interior</h3>
+            </div>
+          </article>
+
+          <article onclick="openLightbox(4)" class="group relative lg:col-span-6 h-[250px] rounded-2xl overflow-hidden border border-white/10 bg-beagle-800 shadow-xl cursor-pointer">
+            <img
+              src="CASA DE MARISCOS.jpg"
+              alt="Marquesina Comida Casera y Minutas en La Casa de los Mariscos"
+              class="w-full h-full object-cover object-[68%_24%] scale-130 group-hover:scale-140 transition-transform duration-700 ease-out"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+            <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">05 / 05</div>
+            <div class="absolute bottom-0 left-0 right-0 p-6">
+              <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Gastronomía Patagónica</span>
+              <h3 class="font-serif text-xl sm:text-2xl text-bone font-semibold mt-0.5">Comida Casera, Minutas & Mariscos</h3>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         5. LA CARTA DIGITAL COMPLETA (TAXONOMÍA, BUSCADOR, SIN FOTOS DE PLATOS, PIN 0608)
+         ===================================================================== -->
+    <section id="carta" class="relative z-10 py-20 lg:py-28 section-bg-facade border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        <!-- Título Dinámico -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+          <div class="dynamic-title-cycle title-visible">
+            <span class="text-xs font-semibold uppercase tracking-[0.25em] text-copper-500">
+              Taxonomía Gastronómica · Pedido Online WhatsApp
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-bone font-semibold mt-3">
+              La Carta de <span class="italic font-normal text-copper-400">La Casa</span>
+            </h2>
+          </div>
+          <p class="text-bone/75 text-sm sm:text-base max-w-md leading-relaxed">
+            Buscá por palabra clave, filtrá por categoría y agregá los platos a tu carrito para consumir en tu mesa, retirar o pedir delivery.
+          </p>
+        </div>
+
+        <!-- Banner de Modo Administrador (Visible al ingresar clave 0608) -->
+        <div id="admin-banner" class="hidden mb-6 p-4 rounded-2xl bg-copper-500/20 border border-copper-500/60 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div class="flex items-center gap-3 text-bone text-sm">
+            <i class="fa-solid fa-unlock-keyhole text-lg text-copper-400"></i>
+            <span><strong>Modo Administrador Activo (0608):</strong> Editá directamente el precio de cualquier producto en la carta.</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="resetMenuPrices()" class="px-3.5 py-1.5 rounded-lg bg-beagle-950/70 hover:bg-beagle-950 text-xs font-semibold text-bone border border-white/15">
+              Restaurar Precios
+            </button>
+            <button onclick="logoutAdmin()" class="px-3.5 py-1.5 rounded-lg bg-copper-500 text-beagle-950 text-xs font-bold">
+              Cerrar Admin
+            </button>
+          </div>
+        </div>
+
+        <!-- Buscador y Pestañas de Taxonomía -->
+        <div class="glass-beagle rounded-2xl p-4 sm:p-6 mb-8">
+          <div class="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <div class="relative flex-1">
+              <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-copper-400"></i>
+              <input
+                type="text"
+                id="menu-search-input"
+                oninput="handleMenuSearch(this.value)"
+                placeholder="Buscar plato, ingrediente o palabra clave (ej: centolla, cazuela, merluza, salmón, rabas, sorrentinos...)"
+                class="w-full pl-11 pr-10 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone placeholder-bone/45 text-sm focus:outline-none focus:border-copper-500 transition-colors"
+              />
+              <button id="clear-search-btn" onclick="clearMenuSearch()" class="hidden absolute right-3.5 top-1/2 -translate-y-1/2 text-bone/60 hover:text-bone">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+
+            <div class="flex items-center justify-between lg:justify-end gap-3">
+              <span id="menu-results-count" class="text-xs sm:text-sm text-bone/80 font-medium px-3.5 py-2.5 rounded-xl bg-beagle-950/60 border border-white/10">
+                Mostrando todos los platos
+              </span>
+              <button onclick="openAdminModal()" class="px-4 py-3 rounded-xl border border-copper-500/50 bg-copper-500/10 hover:bg-copper-500/20 text-xs font-semibold text-copper-400 flex items-center gap-2 transition-all">
+                <i class="fa-solid fa-pen-to-square"></i>
+                <span>Editar Precios</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Categorías / Taxonomía -->
+          <div id="category-tabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar pt-4 mt-4 border-t border-white/10">
+            <!-- Renderizado dinámicamente por JS -->
+          </div>
+        </div>
+
+        <!-- Grilla de Productos (Solo texto + precio + botón agregar al carrito, sin imágenes de platos) -->
+        <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+          <!-- Renderizado dinámicamente por JS -->
+        </div>
+
+        <!-- Estado sin resultados -->
+        <div id="menu-empty-state" class="hidden glass-beagle rounded-2xl p-12 text-center my-6">
+          <i class="fa-solid fa-utensils text-4xl text-copper-500/60 mb-3"></i>
+          <h3 class="font-serif text-xl font-semibold text-bone">No encontramos platos con esa búsqueda</h3>
+          <p class="text-bone/70 text-sm mt-1">Probá buscando "Centolla", "Cazuela", "Merluza", "Cordero" o "Pastas".</p>
+          <button onclick="clearMenuSearch()" class="mt-4 px-5 py-2.5 rounded-xl bg-copper-500 text-beagle-950 text-sm font-semibold">
+            Ver toda la carta
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         6. RESERVAS DE MESA (ENVÍO DIRECTO A WHATSAPP)
+         ===================================================================== -->
+    <section id="reservas" class="relative z-10 py-20 lg:py-28 bg-beagle-900 border-t border-white/10">
+      <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-12">
+          <div class="dynamic-title-cycle title-visible">
+            <span class="text-xs font-semibold uppercase tracking-[0.25em] text-copper-500">
+              Atención Personalizada · Av. San Martín 232
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-bone font-semibold mt-3">
+              Reservá tu <span class="italic font-normal text-copper-400">Mesa</span>
+            </h2>
+          </div>
+          <p class="text-bone/75 text-sm sm:text-base mt-3">
+            Completá los datos de tu reserva y enviala directamente a nuestro WhatsApp oficial (+54 9 2901 48-8405).
+          </p>
+        </div>
+
+        <div class="glass-beagle rounded-2xl p-6 sm:p-10 reveal-on-scroll">
+          <form id="reservation-form" onsubmit="submitReservationWhatsApp(event)" class="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+            <!-- Nombre -->
+            <div class="sm:col-span-2">
+              <label for="res-name" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-2">
+                Nombre y Apellido <span class="text-copper-400">*</span>
+              </label>
+              <input type="text" id="res-name" required placeholder="Ej: Martín Pereyra" class="w-full px-4 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone placeholder-bone/40 text-sm focus:outline-none focus:border-copper-500" />
+            </div>
+
+            <!-- Cantidad de Personas -->
+            <div>
+              <label for="res-guests" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-2">
+                Cantidad de Personas <span class="text-copper-400">*</span>
+              </label>
+              <select id="res-guests" required class="w-full px-4 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone text-sm focus:outline-none focus:border-copper-500">
+                <option value="1 persona">1 persona</option>
+                <option value="2 personas" selected>2 personas</option>
+                <option value="3 personas">3 personas</option>
+                <option value="4 personas">4 personas</option>
+                <option value="5 personas">5 personas</option>
+                <option value="6 personas">6 personas</option>
+                <option value="7 a 10 personas">7 a 10 personas</option>
+                <option value="Más de 10 personas (Grupo)">Más de 10 personas (Grupo)</option>
+              </select>
+            </div>
+
+            <!-- Fecha -->
+            <div>
+              <label for="res-date" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-2">
+                Fecha <span class="text-copper-400">*</span>
+              </label>
+              <input type="date" id="res-date" required class="w-full px-4 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone text-sm focus:outline-none focus:border-copper-500" />
+            </div>
+
+            <!-- Hora -->
+            <div>
+              <label for="res-time" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-2">
+                Hora <span class="text-copper-400">*</span>
+              </label>
+              <select id="res-time" required class="w-full px-4 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone text-sm focus:outline-none focus:border-copper-500">
+                <optgroup label="Almuerzo (12:00 - 15:30)">
+                  <option value="12:00 hs">12:00 hs · Almuerzo</option>
+                  <option value="12:30 hs">12:30 hs · Almuerzo</option>
+                  <option value="13:00 hs">13:00 hs · Almuerzo</option>
+                  <option value="13:30 hs">13:30 hs · Almuerzo</option>
+                  <option value="14:00 hs">14:00 hs · Almuerzo</option>
+                  <option value="14:30 hs">14:30 hs · Almuerzo</option>
+                </optgroup>
+                <optgroup label="Cena (19:30 - 23:30)">
+                  <option value="20:00 hs">20:00 hs · Cena</option>
+                  <option value="20:30 hs" selected>20:30 hs · Cena</option>
+                  <option value="21:00 hs">21:00 hs · Cena</option>
+                  <option value="21:30 hs">21:30 hs · Cena</option>
+                  <option value="22:00 hs">22:00 hs · Cena</option>
+                  <option value="22:30 hs">22:30 hs · Cena</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <!-- Mail Opcional -->
+            <div>
+              <label for="res-email" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-2">
+                Mail <span class="text-bone/50 font-normal">(Opcional)</span>
+              </label>
+              <input type="email" id="res-email" placeholder="tuemail@ejemplo.com" class="w-full px-4 py-3.5 rounded-xl bg-beagle-950/85 border border-white/15 text-bone placeholder-bone/40 text-sm focus:outline-none focus:border-copper-500" />
+            </div>
+
+            <!-- Botón Enviar por WhatsApp -->
+            <div class="sm:col-span-2 pt-2">
+              <button type="submit" class="w-full py-4 px-6 rounded-xl bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-sm sm:text-base shadow-xl shadow-copper-500/20 transition-all flex items-center justify-center gap-3">
+                <i class="fa-brands fa-whatsapp text-xl"></i>
+                <span>Enviar Reserva por WhatsApp</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         7. UBICACIÓN E INTEGRACIÓN INTERACTIVA GOOGLE MAPS
+         ===================================================================== -->
+    <section id="ubicacion" class="relative z-10 py-20 lg:py-28 section-bg-facade border-t border-white/10">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
+          <div class="dynamic-title-cycle title-visible">
+            <span class="text-xs font-semibold uppercase tracking-[0.25em] text-copper-500">
+              Corazón de Ushuaia · Tierra del Fuego
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl lg:text-5xl text-bone font-semibold mt-3">
+              Ubicación & <span class="italic font-normal text-copper-400">Mapa Interactivo</span>
+            </h2>
+          </div>
+          <p class="text-bone/75 text-sm sm:text-base max-w-md leading-relaxed">
+            Visitanos en Av. San Martín 232, V9410 Ushuaia. Explorá el mapa interactivo o abrí la ruta directa en Google Maps.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch reveal-on-scroll">
+          <!-- Tarjeta de Datos del Local -->
+          <div class="lg:col-span-5 glass-beagle rounded-2xl p-6 sm:p-8 flex flex-col justify-between space-y-6">
+            <div class="space-y-4">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-copper-500/15 border border-copper-500/40 text-copper-400 text-xs font-semibold">
+                Marisquería · 4.5 ★ (3.963 reseñas)
+              </div>
+              <h3 class="font-serif text-2xl sm:text-3xl font-semibold text-bone">La Casa de los Mariscos</h3>
+              <ul class="space-y-3.5 text-sm text-bone/85 pt-2">
+                <li class="flex items-start gap-3">
+                  <i class="fa-solid fa-location-dot text-copper-500 mt-1"></i>
+                  <span><strong>Dirección:</strong> Av. San Martín 232, V9410 Ushuaia, Tierra del Fuego</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fa-solid fa-tag text-copper-500 mt-1"></i>
+                  <span><strong>Rango de precios:</strong> $ 30.000 - 70.000</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fa-solid fa-clock text-copper-500 mt-1"></i>
+                  <span><strong>Horarios:</strong> 12:00 a 15:30 hs · 19:30 a 23:30 hs</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fa-brands fa-whatsapp text-copper-500 mt-1"></i>
+                  <span><strong>WhatsApp:</strong> +54 9 2901 48-8405</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="fa-brands fa-instagram text-copper-500 mt-1"></i>
+                  <a href="https://www.instagram.com/lacasadelosmariscosushuaia/" target="_blank" rel="noopener noreferrer" class="hover:text-copper-400 underline">
+                    @lacasadelosmariscosushuaia
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3 pt-4 border-t border-white/10">
+              <a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" class="py-3 px-4 rounded-xl bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-xs sm:text-sm text-center transition-all">
+                <i class="fa-solid fa-diamond-turn-right mr-1"></i> Cómo llegar
+              </a>
+              <button onclick="copyLocationLink()" class="py-3 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/15 text-bone font-semibold text-xs sm:text-sm text-center transition-all">
+                <i class="fa-solid fa-mobile-screen-button mr-1 text-copper-400"></i> Enviar al teléfono
+              </button>
+            </div>
+          </div>
+
+          <!-- Mapa Interactivo Google Maps -->
+          <div class="lg:col-span-7 glass-beagle rounded-2xl overflow-hidden min-h-[360px] sm:min-h-[430px] relative border border-white/15">
+            <iframe
+              title="Mapa Interactivo La Casa de los Mariscos - Av. San Martín 232, Ushuaia"
+              src="https://maps.google.com/maps?q=La%20Casa%20de%20los%20Mariscos%2C%20Av.%20San%20Mart%C3%ADn%20232%2C%20Ushuaia%2C%20Tierra%20del%20Fuego&t=&z=17&ie=UTF8&iwloc=&output=embed"
+              class="w-full h-full min-h-[360px] sm:min-h-[430px] border-0"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+            <a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" class="absolute bottom-4 right-4 px-4 py-2.5 rounded-xl bg-beagle-950/90 backdrop-blur-md border border-copper-500/50 text-copper-400 text-xs font-bold shadow-xl hover:bg-copper-500 hover:text-beagle-950 transition-colors flex items-center gap-2">
+              <i class="fa-solid fa-up-right-from-square"></i> Abrir en Google Maps
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer"><div class="footer-main"><a class="wordmark" href="#inicio"><span class="brand-stamp">LG</span><span>la guada<small>parrilla de barrio</small></span></a><div class="footer-contact"><a href="tel:+543834033990">0383 403-3990</a><a href="https://maps.app.goo.gl/pzXtZ1a3ck9ShzBs9" target="_blank" rel="noopener">Ayacucho 769, Catamarca</a><a href="https://www.facebook.com/laguadaparrilla/" target="_blank" rel="noopener">Facebook ↗</a></div><a class="footer-book" href="#reservas">Reservá tu mesa ↑</a></div><div class="footer-bottom"><span>© <span id="year"></span> La Guada Parrilla · San Fernando del Valle de Catamarca</span><span>Hecho para compartir <b>✳</b></span></div></footer>
-  <a class="wa-float" href="https://wa.me/5493834033990?text=Hola%20La%20Guada%2C%20quisiera%20hacer%20una%20consulta." target="_blank" rel="noopener" aria-label="Escribir a La Guada por WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.52 3.48A11.79 11.79 0 0 0 12.13 0C5.58 0 .25 5.33.25 11.88c0 2.09.55 4.14 1.6 5.94L.15 24l6.34-1.66a11.9 11.9 0 0 0 5.64 1.44h.01c6.55 0 11.88-5.33 11.88-11.88 0-3.17-1.23-6.15-3.5-8.42ZM12.14 21.76a9.9 9.9 0 0 1-5.05-1.39l-.36-.21-3.76.99 1-3.67-.24-.38a9.86 9.86 0 0 1-1.52-5.22c0-5.46 4.45-9.91 9.92-9.91a9.84 9.84 0 0 1 7.01 2.9 9.84 9.84 0 0 1 2.9 7.01c0 5.47-4.45 9.92-9.9 9.92Zm5.44-7.42c-.3-.15-1.77-.87-2.04-.97-.28-.1-.48-.15-.68.15-.2.3-.77.97-.94 1.17-.17.2-.35.22-.65.07-.3-.15-1.26-.47-2.4-1.5-.89-.8-1.5-1.78-1.68-2.08-.17-.3-.02-.46.13-.61.14-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.68-1.63-.93-2.24-.24-.59-.49-.5-.68-.51h-.58c-.2 0-.52.07-.8.37-.28.3-1.05 1.02-1.05 2.49s1.07 2.89 1.22 3.09c.15.2 2.1 3.21 5.1 4.5.71.3 1.27.49 1.7.62.71.23 1.36.2 1.87.12.57-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.07-.13-.27-.2-.57-.35Z"/></svg></a>
-  <script type="module" src="app.js"></script>
+
+  <!-- =====================================================================
+       8. FOOTER INFERIOR CON TODA LA INFORMACIÓN, REDES Y UBICACIÓN
+       ===================================================================== -->
+  <footer class="relative z-10 bg-beagle-950 border-t border-white/10 pt-16 pb-10 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10">
+        <!-- Columna 1: Identidad -->
+        <div class="space-y-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-full border border-copper-500/60 flex items-center justify-center bg-beagle-900 text-copper-500">
+              <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke-linecap="round"/>
+                <polygon points="12,7 13.5,12 12,13.5 10.5,12" fill="currentColor" stroke="none"/>
+              </svg>
+            </div>
+            <div>
+              <h4 class="font-serif text-lg font-semibold text-bone">La Casa de los Mariscos</h4>
+              <p class="text-[11px] uppercase tracking-[0.2em] text-copper-500">Ushuaia · Patagonia</p>
+            </div>
+          </div>
+          <p class="text-sm text-bone/70 leading-relaxed">
+            Marisquería tradicional · 4.5 ★ (3.963 opiniones) · Rango: $ 30.000 - 70.000.
+          </p>
+          <!-- Redes Sociales -->
+          <div class="flex items-center gap-3 pt-1">
+            <a href="https://www.instagram.com/lacasadelosmariscosushuaia/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:border-copper-500 hover:text-copper-400 text-bone flex items-center justify-center transition-colors">
+              <i class="fa-brands fa-instagram text-lg"></i>
+            </a>
+            <a href="https://wa.me/5492901488405" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:border-copper-500 hover:text-copper-400 text-bone flex items-center justify-center transition-colors">
+              <i class="fa-brands fa-whatsapp text-lg"></i>
+            </a>
+            <a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" aria-label="Google Maps" class="w-10 h-10 rounded-full border border-white/15 bg-white/5 hover:border-copper-500 hover:text-copper-400 text-bone flex items-center justify-center transition-colors">
+              <i class="fa-solid fa-location-dot text-lg"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Columna 2: Ubicación & Contacto -->
+        <div class="space-y-3 text-sm text-bone/75">
+          <h5 class="font-serif text-base font-semibold text-copper-400 uppercase tracking-wider">Ubicación & Contacto</h5>
+          <p class="flex items-start gap-2.5">
+            <i class="fa-solid fa-location-dot text-copper-500 mt-1"></i>
+            <span>Av. San Martín 232, V9410 Ushuaia, Tierra del Fuego, Argentina</span>
+          </p>
+          <p class="flex items-center gap-2.5">
+            <i class="fa-solid fa-phone text-copper-500"></i>
+            <a href="tel:+542901488405" class="hover:text-bone">+54 9 2901 48-8405</a>
+          </p>
+          <p class="flex items-center gap-2.5">
+            <i class="fa-regular fa-envelope text-copper-500"></i>
+            <span>Lacasadelosmariscos@gmail.com</span>
+          </p>
+          <p class="flex items-center gap-2.5">
+            <i class="fa-brands fa-instagram text-copper-500"></i>
+            <a href="https://www.instagram.com/lacasadelosmariscosushuaia/" target="_blank" rel="noopener noreferrer" class="hover:text-bone">@lacasadelosmariscosushuaia</a>
+          </p>
+        </div>
+
+        <!-- Columna 3: Opciones del Local -->
+        <div class="space-y-3 text-sm">
+          <h5 class="font-serif text-base font-semibold text-copper-400 uppercase tracking-wider">Servicios Google Maps</h5>
+          <ul class="space-y-2 text-bone/75">
+            <li><a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" class="hover:text-copper-400">Cómo llegar</a></li>
+            <li><button onclick="saveRestaurantBookmark()" class="hover:text-copper-400">Guardar ubicación</button></li>
+            <li><button onclick="copyLocationLink()" class="hover:text-copper-400">Enviar al teléfono</button></li>
+            <li><button onclick="shareRestaurant()" class="hover:text-copper-400">Compartir restaurante</button></li>
+            <li><a href="#carta" class="hover:text-copper-400 font-semibold text-bone">Pedir en línea</a></li>
+          </ul>
+        </div>
+
+        <!-- Columna 4: Código ZIP & Administración -->
+        <div class="space-y-3 text-sm">
+          <h5 class="font-serif text-base font-semibold text-copper-400 uppercase tracking-wider">Herramientas</h5>
+          <p class="text-bone/65 text-xs leading-relaxed">
+            Descargá el paquete ZIP completo (HTML, CSS, JS, Three.js) o ingresá con clave 0608 para editar precios.
+          </p>
+          <div class="flex flex-col gap-2.5 pt-1">
+            <button onclick="downloadProjectZip()" class="w-full py-2.5 px-4 rounded-xl bg-copper-500/20 border border-copper-500/50 hover:bg-copper-500/30 text-copper-400 font-semibold text-xs flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-file-zipper"></i> Descargar ZIP Completo
+            </button>
+            <button onclick="openAdminModal()" class="w-full py-2.5 px-4 rounded-xl bg-white/5 border border-white/15 hover:bg-white/10 text-bone font-semibold text-xs flex items-center justify-center gap-2 transition-all">
+              <i class="fa-solid fa-lock text-copper-500"></i> Administrador (0608)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-bone/50">
+        <p>© 2026 La Casa de los Mariscos · Av. San Martín 232, Ushuaia · Todos los derechos reservados.</p>
+        <p>Marisquería · $ 30.000 - 70.000 · (3.963 opiniones)</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Botón Flotante de Pedido Rápido -->
+  <div class="fixed bottom-5 right-5 z-30">
+    <button onclick="toggleCartDrawer(true)" class="px-5 py-3.5 rounded-full bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-xs sm:text-sm shadow-2xl shadow-beagle-950 flex items-center gap-2.5 transition-all">
+      <i class="fa-solid fa-bag-shopping text-base"></i>
+      <span>Mi Pedido (<span id="floating-cart-count">0</span>)</span>
+    </button>
+  </div>
+
+  <!-- =====================================================================
+       CARRITO DE COMPRAS LATERAL (MESA EN LOCAL / PARA LLEVAR / DELIVERY -> WHATSAPP)
+       ===================================================================== -->
+  <div id="cart-drawer-backdrop" onclick="toggleCartDrawer(false)" class="fixed inset-0 z-50 bg-beagle-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300"></div>
+
+  <aside id="cart-drawer" class="fixed top-0 right-0 bottom-0 z-50 w-full max-w-md bg-beagle-900 border-l border-copper-500/30 shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-5 border-b border-white/10 flex items-center justify-between bg-beagle-950">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-copper-500/20 text-copper-400 flex items-center justify-center">
+          <i class="fa-solid fa-bag-shopping"></i>
+        </div>
+        <div>
+          <h3 class="font-serif text-lg font-semibold text-bone">Tu Pedido Online</h3>
+          <p class="text-xs text-bone/60">Continuar por WhatsApp</p>
+        </div>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="w-9 h-9 rounded-xl bg-white/5 text-bone/75 hover:text-bone flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-3"></div>
+
+    <div class="p-5 border-t border-white/10 bg-beagle-950/95 space-y-4">
+      <div class="flex items-center justify-between text-base font-bold text-bone">
+        <span>Total Estimado:</span>
+        <span id="cart-total-price" class="text-xl text-copper-400">$ 0</span>
+      </div>
+
+      <form id="whatsapp-order-form" onsubmit="sendOrderToWhatsApp(event)" class="space-y-3">
+        <div>
+          <label for="order-customer-name" class="block text-[11px] font-semibold uppercase tracking-wider text-bone/80 mb-1">
+            Tu Nombre <span class="text-copper-400">*</span>
+          </label>
+          <input type="text" id="order-customer-name" required placeholder="Ej: Laura Fernández" class="w-full px-3.5 py-2.5 rounded-xl bg-beagle-900 border border-white/15 text-bone text-sm placeholder-bone/40 focus:outline-none focus:border-copper-500" />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-semibold uppercase tracking-wider text-bone/80 mb-1.5">
+            ¿Cómo vas a recibir tu pedido? <span class="text-copper-400">*</span>
+          </label>
+          <div class="grid grid-cols-3 gap-2">
+            <label class="cursor-pointer">
+              <input type="radio" name="order-mode" value="En el local" checked onchange="handleOrderModeChange(this.value)" class="peer sr-only" />
+              <div class="py-2 px-2 rounded-xl border border-white/15 bg-beagle-900/80 peer-checked:bg-copper-500/20 peer-checked:border-copper-500 text-center text-xs font-semibold text-bone/75 peer-checked:text-copper-400 transition-all">
+                <i class="fa-solid fa-utensils block mb-1 text-sm"></i> En el local
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="order-mode" value="Para llevar" onchange="handleOrderModeChange(this.value)" class="peer sr-only" />
+              <div class="py-2 px-2 rounded-xl border border-white/15 bg-beagle-900/80 peer-checked:bg-copper-500/20 peer-checked:border-copper-500 text-center text-xs font-semibold text-bone/75 peer-checked:text-copper-400 transition-all">
+                <i class="fa-solid fa-person-walking-luggage block mb-1 text-sm"></i> Para llevar
+              </div>
+            </label>
+            <label class="cursor-pointer">
+              <input type="radio" name="order-mode" value="Delivery" onchange="handleOrderModeChange(this.value)" class="peer sr-only" />
+              <div class="py-2 px-2 rounded-xl border border-white/15 bg-beagle-900/80 peer-checked:bg-copper-500/20 peer-checked:border-copper-500 text-center text-xs font-semibold text-bone/75 peer-checked:text-copper-400 transition-all">
+                <i class="fa-solid fa-motorcycle block mb-1 text-sm"></i> Delivery
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Número de Mesa (Si consume en el local) -->
+        <div id="table-number-wrapper">
+          <label for="order-table-number" class="block text-[11px] font-semibold uppercase tracking-wider text-bone/80 mb-1">
+            Número de Mesa en el Salón <span class="text-copper-400">*</span>
+          </label>
+          <input type="text" id="order-table-number" placeholder="Ej: Mesa 4" class="w-full px-3.5 py-2.5 rounded-xl bg-beagle-900 border border-white/15 text-bone text-sm placeholder-bone/40 focus:outline-none focus:border-copper-500" />
+        </div>
+
+        <!-- Dirección de Delivery -->
+        <div id="delivery-address-wrapper" class="hidden">
+          <label for="order-delivery-address" class="block text-[11px] font-semibold uppercase tracking-wider text-bone/80 mb-1">
+            Dirección de Delivery en Ushuaia <span class="text-copper-400">*</span>
+          </label>
+          <input type="text" id="order-delivery-address" placeholder="Calle, altura, hotel o departamento" class="w-full px-3.5 py-2.5 rounded-xl bg-beagle-900 border border-white/15 text-bone text-sm placeholder-bone/40 focus:outline-none focus:border-copper-500" />
+        </div>
+
+        <button type="submit" class="w-full py-3.5 px-5 rounded-xl bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-sm shadow-lg flex items-center justify-center gap-2.5 transition-all">
+          <i class="fa-brands fa-whatsapp text-xl"></i>
+          <span>Continuar por WhatsApp</span>
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- =====================================================================
+       MODAL ADMINISTRADOR (CLAVE: 0608)
+       ===================================================================== -->
+  <div id="admin-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-beagle-950/85 backdrop-blur-md">
+    <div class="glass-beagle rounded-2xl max-w-sm w-full p-6 sm:p-8 relative border border-copper-500/40">
+      <button onclick="closeAdminModal()" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-white/5 text-bone/75 hover:text-bone flex items-center justify-center">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <div class="w-12 h-12 rounded-xl bg-copper-500/20 text-copper-400 flex items-center justify-center text-xl mb-4">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <h3 class="font-serif text-2xl font-semibold text-bone">Acceso Administrador</h3>
+      <p class="text-xs sm:text-sm text-bone/75 mt-1">
+        Ingresá la clave de seguridad para editar los precios de la carta.
+      </p>
+      <form onsubmit="verifyAdminPin(event)" class="mt-5 space-y-4">
+        <div>
+          <label for="admin-pin-input" class="block text-xs font-semibold uppercase tracking-wider text-bone/80 mb-1.5">Clave Numérica</label>
+          <input
+            type="password"
+            id="admin-pin-input"
+            maxlength="8"
+            inputmode="numeric"
+            required
+            placeholder="••••"
+            class="w-full px-4 py-3 rounded-xl bg-beagle-950 border border-white/20 text-bone text-center text-xl tracking-[0.5em] font-bold focus:outline-none focus:border-copper-500"
+          />
+        </div>
+        <button type="submit" class="w-full py-3 rounded-xl bg-copper-500 hover:bg-copper-600 text-beagle-950 font-bold text-sm shadow-lg transition-all">
+          Ingresar y Editar Precios
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       LIGHTBOX DE GALERÍA (5 FOTOS)
+       ===================================================================== -->
+  <div id="gallery-lightbox" onclick="closeLightbox()" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-beagle-950/95 backdrop-blur-lg">
+    <div class="max-w-4xl w-full relative" onclick="event.stopPropagation()">
+      <button onclick="closeLightbox()" class="absolute -top-12 right-0 w-10 h-10 rounded-full bg-white/10 hover:bg-copper-500 hover:text-beagle-950 text-bone flex items-center justify-center transition-colors">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+      <div class="rounded-2xl overflow-hidden border border-copper-500/35 bg-beagle-900 shadow-2xl">
+        <div class="h-[55vh] sm:h-[68vh] overflow-hidden bg-black flex items-center justify-center">
+          <img id="lightbox-img" src="CASA DE MARISCOS.jpg" alt="Vista ampliada" class="w-full h-full object-cover transition-all duration-500" />
+        </div>
+        <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-beagle-950">
+          <div>
+            <span id="lightbox-badge" class="text-xs font-semibold uppercase tracking-wider text-copper-400">Galería Oficial</span>
+            <h4 id="lightbox-title" class="font-serif text-xl font-semibold text-bone">Fachada La Casa de los Mariscos</h4>
+            <p id="lightbox-desc" class="text-xs text-bone/70">Av. San Martín 232, Ushuaia</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="navigateLightbox(-1)" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-bone text-xs font-semibold">
+              <i class="fa-solid fa-chevron-left mr-1"></i> Anterior
+            </button>
+            <button onclick="navigateLightbox(1)" class="px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-bone text-xs font-semibold">
+              Siguiente <i class="fa-solid fa-chevron-right ml-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       JAVASCRIPT: THREE.JS, CARTA COMPLETA, CARRITO, WHATSAPP, ADMIN Y ZIP
+       ===================================================================== -->
+  <script>
+    const WHATSAPP_NUMBER = '5492901488405';
+    const ADMIN_PIN = '0608';
+    const STORAGE_KEY_MENU = 'lcdm_ushuaia_menu_beagle_v1';
+    const STORAGE_KEY_CART = 'lcdm_ushuaia_cart_beagle_v1';
+
+    const DEFAULT_MENU_ITEMS = [
+      // RECOMENDACIONES
+      { id: 'rec-1', category: 'Recomendaciones', name: 'Tarantela Fueguina', desc: 'King crab (centolla), langostinos al ajillo, mejillones a la provenzal y papas noisette.', price: 59900, badge: 'Estrella' },
+      { id: 'rec-2', category: 'Recomendaciones', name: 'Cazuela de la Casa', desc: 'Centolla fresca, guiso cremoso de langostinos y papas patagónicas.', price: 59900, badge: 'Recomendado' },
+      { id: 'rec-3', category: 'Recomendaciones', name: 'Cazuela de Centolla, Vieyras y Langostinos', desc: 'Combinación austral de centolla, vieyras tiernas y langostinos del sur.', price: 59900, badge: 'Chef' },
+      { id: 'rec-4', category: 'Recomendaciones', name: 'Cazuela de Mariscos y Centolla', desc: 'Cazuela tradicional caliente con frutos de mar seleccionados y centolla fueguina.', price: 52900, badge: 'Clásico' },
+      { id: 'rec-5', category: 'Recomendaciones', name: 'Merluza Negra', desc: 'Filet de merluza negra austral sellada, textura mantecosa y sabor delicado.', price: 47900, badge: 'Austral' },
+      { id: 'rec-6', category: 'Recomendaciones', name: 'Tallarines de la Abuela Eva', desc: 'Pasta casera artesanal con receta tradicional familiar de la casa.', price: 32900, badge: 'Casero' },
+
+      // ENTRADAS
+      { id: 'ent-1', category: 'Entradas', name: 'Picada de la Casa x2', desc: 'Degustación fría y caliente: centolla, mejillones, langostinos y vieyras para compartir.', price: 46500 },
+      { id: 'ent-2', category: 'Entradas', name: 'Centolla Natural (Entrada)', desc: 'Porción de carne pura de centolla fueguina servida al natural con aderezo suave.', price: 38900 },
+      { id: 'ent-3', category: 'Entradas', name: 'Vieyras a la Parmesana', desc: 'Vieyras gratinadas al horno con queso parmesano y toque de manteca.', price: 29500 },
+      { id: 'ent-4', category: 'Entradas', name: 'Gambas al Ajillo', desc: 'Langostinos salteados en aceite de oliva, ajo laminado y guindilla suave.', price: 28900 },
+      { id: 'ent-5', category: 'Entradas', name: 'Rabas a la Romana', desc: 'Anillos de calamar tiernos rebozados y fritos, acompañados con limón.', price: 25900 },
+      { id: 'ent-6', category: 'Entradas', name: 'Rabas a la Provenzal', desc: 'Rabas crocantes salteadas con ajo fresco y perejil picado.', price: 26900 },
+      { id: 'ent-7', category: 'Entradas', name: 'Mejillones a la Provenzal', desc: 'Mejillones del Canal Beagle cocidos con ajo, perejil y vino blanco.', price: 24500 },
+      { id: 'ent-8', category: 'Entradas', name: 'Sopa de Centolla', desc: 'Crema caliente artesanal elaborada con centolla austral.', price: 23900 },
+      { id: 'ent-9', category: 'Entradas', name: 'Cornalitos Fritos', desc: 'Porción crocante de cornalitos frescos con gajos de limón.', price: 19900 },
+      { id: 'ent-10', category: 'Entradas', name: 'Empanada Fueguina (Cordero / Mariscos / Langostinos)', desc: 'Empanada casera horneada o frita a elección: cordero patagónico, mariscos o langostinos.', price: 6500 },
+
+      // MARISCOS
+      { id: 'mar-1', category: 'Mariscos', name: 'Centolla Entera', desc: 'Ejemplar entero de centolla fueguina fresca (consultar peso disponible en salón).', price: 69900, badge: 'Icónico' },
+      { id: 'mar-2', category: 'Mariscos', name: 'Centolla Parmesana', desc: 'Carne de centolla gratinada con crema suave y queso parmesano.', price: 58900 },
+      { id: 'mar-3', category: 'Mariscos', name: 'Centolla a la Provenzal', desc: 'Centolla salteada con ajo, perejil fresco y aceite de oliva.', price: 57900 },
+      { id: 'mar-4', category: 'Mariscos', name: 'Cazuela de Pulpo y Centolla', desc: 'Cazuela casera intensa con tentáculos de pulpo tierno y centolla.', price: 58500 },
+      { id: 'mar-5', category: 'Mariscos', name: 'Cazuela de Pulpo, Langostinos y Vieyras', desc: 'Guiso marino de pulpo, langostinos pelados y vieyras.', price: 55900 },
+      { id: 'mar-6', category: 'Mariscos', name: 'Paella de Mariscos para 2 Personas', desc: 'Arroz azafranado con variedad completa de mariscos del sur.', price: 64900 },
+      { id: 'mar-7', category: 'Mariscos', name: 'Picada de Mariscos para 2 Personas', desc: 'Selección abundante de frutos de mar calientes y fríos para dos comensales.', price: 56900 },
+      { id: 'mar-8', category: 'Mariscos', name: 'Pulpo a la Gallega', desc: 'Pulpo tierno sobre colchón de papas naturales con pimentón dulce y oliva.', price: 54900 },
+      { id: 'mar-9', category: 'Mariscos', name: 'Arroz con Centolla', desc: 'Arroz cremoso cocinado en caldo de mar con abundante carne de centolla.', price: 49900 },
+      { id: 'mar-10', category: 'Mariscos', name: 'Arroz con Mariscos', desc: 'Arroz meloso con mejillones, calamares, langostinos y vieyras.', price: 43900 },
+      { id: 'mar-11', category: 'Mariscos', name: 'Cazuela de Mariscos Clásica', desc: 'Surtido tradicional de frutos de mar en salsa casera de tomate y especias.', price: 44900 },
+      { id: 'mar-12', category: 'Mariscos', name: 'Langostinos Empanados', desc: 'Langostinos enteros rebozados crocantes con guarnición.', price: 39900 },
+      { id: 'mar-13', category: 'Mariscos', name: 'Langostinos al Verdeo', desc: 'Langostinos salteados en crema suave y cebolla de verdeo.', price: 41900 },
+
+      // PESCADOS
+      { id: 'pes-1', category: 'Pescados', name: 'Salmón con Salsa de Camarón', desc: 'Filet de salmón rosado bañado en salsa cremosa de camarones.', price: 46900 },
+      { id: 'pes-2', category: 'Pescados', name: 'Salmón Grillé', desc: 'Posta de salmón rosado a la plancha con guarnición a elección.', price: 42900 },
+      { id: 'pes-3', category: 'Pescados', name: 'Trucha con Mariscos', desc: 'Trucha arcoíris patagónica cubierta con salsa de frutos de mar.', price: 43500 },
+      { id: 'pes-4', category: 'Pescados', name: 'Trucha a la Napolitana', desc: 'Trucha gratinada con salsa fileto casera, jamón y muzzarella.', price: 39500 },
+      { id: 'pes-5', category: 'Pescados', name: 'Trucha Grillé', desc: 'Trucha fresca del Beagle a la plancha con hierbas y limón.', price: 36900 },
+      { id: 'pes-6', category: 'Pescados', name: 'Abadejo al Roquefort', desc: 'Filet de abadejo en salsa cremosa de queso azul.', price: 38900 },
+      { id: 'pes-7', category: 'Pescados', name: 'Abadejo a la Romana', desc: 'Filet de abadejo tierno rebozado dorado.', price: 34900 },
+      { id: 'pes-8', category: 'Pescados', name: 'Abadejo Grillé', desc: 'Filet de abadejo natural a la plancha con guarnición.', price: 33900 },
+      { id: 'pes-9', category: 'Pescados', name: 'Pesca del Día con Salsa de Limón', desc: 'Pescado fresco de captura diaria con emulsión cítrica.', price: 34500 },
+      { id: 'pes-10', category: 'Pescados', name: 'Pesca del Día Grillé', desc: 'Filet fresco del día sellado a la plancha.', price: 31900 },
+
+      // CARNES
+      { id: 'car-1', category: 'Carnes', name: 'Cazuela de Cordero Fueguino', desc: 'Guiso tradicional patagónico de cocción lenta con vegetales.', price: 39900, badge: 'Patagonia' },
+      { id: 'car-2', category: 'Carnes', name: 'Cordero a la Mostaza', desc: 'Corte tierno de cordero austral en salsa suave de mostaza y hierbas.', price: 41500 },
+      { id: 'car-3', category: 'Carnes', name: 'Bife de Chorizo', desc: 'Corte clásico argentino a la plancha jugoso con guarnición.', price: 36900 },
+      { id: 'car-4', category: 'Carnes', name: 'Bife a lo Pobre', desc: 'Bife de chorizo acompañado con papas fritas y huevos fritos.', price: 39500 },
+      { id: 'car-5', category: 'Carnes', name: 'Bife al Champignon', desc: 'Bife jugoso con salsa cremosa de champiñones frescos.', price: 38900 },
+      { id: 'car-6', category: 'Carnes', name: 'Bife a la Pimienta', desc: 'Corte vacuno sellado con reducción de pimienta negra y crema.', price: 38500 },
+      { id: 'car-7', category: 'Carnes', name: 'Bife al Ajillo', desc: 'Bife de chorizo dorado con ajo y perejil.', price: 37500 },
+      { id: 'car-8', category: 'Carnes', name: 'Bondiola con Salsa Mostaza', desc: 'Bondiola de cerdo braseada con salsa de mostaza dulce.', price: 33900 },
+      { id: 'car-9', category: 'Carnes', name: 'Milanesa a la Napolitana', desc: 'Milanesa de ternera con salsa de tomate, jamón, queso y guarnición.', price: 32500 },
+      { id: 'car-10', category: 'Carnes', name: 'Milanesa a la Suiza', desc: 'Milanesa gratinada con salsa blanca y queso fundido.', price: 32500 },
+      { id: 'car-11', category: 'Carnes', name: 'Milanesa con Guarnición', desc: 'Milanesa clásica de ternera con papas fritas o puré.', price: 28900 },
+      { id: 'car-12', category: 'Carnes', name: 'Suprema a la Napolitana', desc: 'Suprema de pollo rebozada con salsa fileto, jamón y queso.', price: 30900 },
+      { id: 'car-13', category: 'Carnes', name: 'Suprema con Guarnición', desc: 'Suprema de pollo crocante con guarnición a elección.', price: 27500 },
+      { id: 'car-14', category: 'Carnes', name: 'Pollo al Ajillo / Pollo Grillé', desc: 'Pechuga de pollo jugosa grillada o salteada al ajillo.', price: 27900 },
+
+      // PASTAS
+      { id: 'pas-1', category: 'Pastas', name: 'Sorrentinos de Centolla', desc: 'Pasta rellena artesanal de centolla fueguina con salsa a elección.', price: 42900, badge: 'Favorito' },
+      { id: 'pas-2', category: 'Pastas', name: 'Sorrentinos de Salmón con Salsa de Camarón', desc: 'Sorrentinos caseros de salmón rosado en salsa de camarones.', price: 41500 },
+      { id: 'pas-3', category: 'Pastas', name: 'Tallarines con Centolla', desc: 'Tallarines al huevo salteados con carne de centolla austral.', price: 39900 },
+      { id: 'pas-4', category: 'Pastas', name: 'Tallarines de la Casa', desc: 'Tallarines artesanales con pulpo tierno y salsa portuguesa.', price: 38500 },
+      { id: 'pas-5', category: 'Pastas', name: 'Tallarines con Mariscos', desc: 'Tallarines caseros con salteado de frutos de mar.', price: 36900 },
+      { id: 'pas-6', category: 'Pastas', name: 'Sorrentinos de Cordero', desc: 'Sorrentinos rellenos de cordero patagónico braseado.', price: 34900 },
+      { id: 'pas-7', category: 'Pastas', name: 'Sorrentinos de Jamón y Queso', desc: 'Pasta rellena clásica con salsa a elección.', price: 28500 },
+      { id: 'pas-8', category: 'Pastas', name: 'Sorrentinos de Calabaza', desc: 'Sorrentinos vegetarianos de calabaza asada y queso.', price: 27900 },
+      { id: 'pas-9', category: 'Pastas', name: 'Tallarines con Salsa (Fileto / Bolognesa / 4 Quesos / Roquefort)', desc: 'Tallarines caseros con tu salsa tradicional preferida.', price: 25900 },
+
+      // POSTRES
+      { id: 'pos-1', category: 'Postres', name: 'Bombón de Calafate', desc: 'Helado artesanal del fruto típico patagónico bañado en chocolate.', price: 13900, badge: 'Regional' },
+      { id: 'pos-2', category: 'Postres', name: 'Postre de la Casa', desc: 'Especialidad dulce artesanal de La Casa de los Mariscos.', price: 14500 },
+      { id: 'pos-3', category: 'Postres', name: 'Brownie con Helado', desc: 'Brownie tibio de chocolate intenso con bocha de helado artesanal.', price: 13500 },
+      { id: 'pos-4', category: 'Postres', name: 'Tarta Tibia de Manzana', desc: 'Tarta casera de manzanas caramelizadas servida tibia.', price: 12900 },
+      { id: 'pos-5', category: 'Postres', name: 'Tiramisú Artesanal', desc: 'Clásico postre italiano con mascarpone, vainillas y café.', price: 12500 },
+      { id: 'pos-6', category: 'Postres', name: 'Chocotorta', desc: 'Porción clásica argentina de chocolinas, dulce de leche y queso crema.', price: 11900 },
+      { id: 'pos-7', category: 'Postres', name: 'Flan Casero', desc: 'Flan tradicional al huevo con dulce de leche o crema.', price: 10500 },
+      { id: 'pos-8', category: 'Postres', name: 'Budín de Pan', desc: 'Budín de pan casero con caramelo, dulce de leche o crema.', price: 10500 },
+      { id: 'pos-9', category: 'Postres', name: 'Postre Vigilante', desc: 'Queso fresco acompañado con dulce de batata o membrillo.', price: 9900 },
+      { id: 'pos-10', category: 'Postres', name: 'Copa Helada', desc: 'Dos bochas de helado artesanal a elección.', price: 10900 }
+    ];
+
+    let menuItems = [];
+    let cart = [];
+    let activeCategory = 'Todas';
+    let searchQuery = '';
+    let isAdminAuthenticated = false;
+    let currentLightboxIndex = 0;
+
+    const GALLERY_PHOTOS = [
+      {
+        src: 'CASA DE MARISCOS.jpg',
+        badge: 'Foto Principal · Google Maps',
+        title: 'Fachada Histórica Fueguina',
+        desc: 'Av. San Martín 232, Ushuaia · Nuestra tradicional casa rosada',
+        objectPos: 'center center'
+      },
+      {
+        src: 'CASA DE MARISCOS.jpg',
+        badge: 'Insignia del Local',
+        title: 'Cartel Oficial de la Centolla',
+        desc: 'Cartel tradicional de La Casa de los Mariscos Ushuaia',
+        objectPos: '22% 12%'
+      },
+      {
+        src: 'CASA DE MARISCOS.jpg',
+        badge: 'Pesca Fresca',
+        title: 'Pizarra: "Hay Centolla Entera"',
+        desc: 'Anuncio diario en el frente de nuestro salón sobre Av. San Martín',
+        objectPos: '35% 58%'
+      },
+      {
+        src: 'CASA DE MARISCOS.jpg',
+        badge: 'Salón & Calidez',
+        title: 'Ventanales Azules y Salón Interior',
+        desc: 'Ambiente cálido para disfrutar la gastronomía del Canal Beagle',
+        objectPos: '76% 55%'
+      },
+      {
+        src: 'CASA DE MARISCOS.jpg',
+        badge: 'Gastronomía Patagónica',
+        title: 'Comida Casera, Minutas & Mariscos',
+        desc: 'Tradición culinaria en el Fin del Mundo',
+        objectPos: '68% 24%'
+      }
+    ];
+
+    window.onload = function () {
+      loadPersistedData();
+      setDefaultReservationDate();
+      renderCategoryTabs();
+      renderMenu();
+      renderCart();
+      initThreeJSBackground();
+      init3SecondTitleCycle();
+      initScrollReveal();
+    };
+
+    function loadPersistedData() {
+      try {
+        const savedMenu = localStorage.getItem(STORAGE_KEY_MENU);
+        menuItems = savedMenu ? JSON.parse(savedMenu) : JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+      } catch (e) {
+        menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+      }
+
+      try {
+        const savedCart = localStorage.getItem(STORAGE_KEY_CART);
+        cart = savedCart ? JSON.parse(savedCart) : [];
+      } catch (e) {
+        cart = [];
+      }
+    }
+
+    function saveMenuToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_MENU, JSON.stringify(menuItems));
+      } catch (e) {}
+    }
+
+    function saveCartToStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(cart));
+      } catch (e) {}
+    }
+
+    function setDefaultReservationDate() {
+      const dateInput = document.getElementById('res-date');
+      if (dateInput) {
+        const today = new Date();
+        const formatted = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        dateInput.min = formatted;
+        dateInput.value = formatted;
+      }
+    }
+
+    /* Ciclo exacto de 3 segundos para desvanecer títulos y mostrar la foto real */
+    function init3SecondTitleCycle() {
+      const animatedTitles = document.querySelectorAll('.dynamic-title-cycle');
+      let isVisible = true;
+      setInterval(() => {
+        isVisible = !isVisible;
+        animatedTitles.forEach((el) => {
+          el.classList.toggle('title-visible', isVisible);
+          el.classList.toggle('title-hidden', !isVisible);
+        });
+      }, 3000);
+    }
+
+    /* Efectos de scrolling */
+    function initScrollReveal() {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) entry.target.classList.add('revealed');
+          });
+        },
+        { threshold: 0.12 }
+      );
+      document.querySelectorAll('.reveal-on-scroll').forEach((el) => observer.observe(el));
+    }
+
+    /* Escena 3D Three.js inspirada en las aguas del Canal Beagle y destellos Cobre */
+    function initThreeJSBackground() {
+      const container = document.getElementById('three-canvas-container');
+      if (!container || typeof THREE === 'undefined') return;
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.z = 35;
+
+      const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      container.appendChild(renderer.domElement);
+
+      const particleCount = 170;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particleCount * 3);
+      const colors = new Float32Array(particleCount * 3);
+
+      const palette = [
+        new THREE.Color('#D4A373'), // Copper 500
+        new THREE.Color('#E2B686'), // Copper 400
+        new THREE.Color('#38BDF8'), // Canal Beagle
+        new THREE.Color('#F8FAFC')  // Bone
+      ];
+
+      for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 90;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 70;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 40;
+
+        const color = palette[i % palette.length];
+        colors[i * 3] = color.r;
+        colors[i * 3 + 1] = color.g;
+        colors[i * 3 + 2] = color.b;
+      }
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 0.42,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.6
+      });
+
+      const particles = new THREE.Points(geometry, material);
+      scene.add(particles);
+
+      const waveGeo = new THREE.TorusKnotGeometry(12, 2.4, 90, 12);
+      const waveMat = new THREE.MeshBasicMaterial({
+        color: 0xD4A373,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.045
+      });
+      const oceanKnot = new THREE.Mesh(waveGeo, waveMat);
+      oceanKnot.position.set(14, -4, -12);
+      scene.add(oceanKnot);
+
+      let mouseX = 0;
+      let mouseY = 0;
+      window.addEventListener('mousemove', (e) => {
+        mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+        mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+      }, { passive: true });
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+
+      const clock = new THREE.Clock();
+      function animate() {
+        requestAnimationFrame(animate);
+        const elapsed = clock.getElapsedTime();
+        particles.rotation.y = elapsed * 0.04 + mouseX * 0.15;
+        particles.rotation.x = Math.sin(elapsed * 0.15) * 0.08 + mouseY * 0.1;
+        oceanKnot.rotation.x = elapsed * 0.08;
+        oceanKnot.rotation.y = elapsed * 0.11;
+        renderer.render(scene, camera);
+      }
+      animate();
+    }
+
+    function formatARS(value) {
+      return '$ ' + Number(value).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function renderCategoryTabs() {
+      const categories = ['Todas', ...new Set(menuItems.map((item) => item.category))];
+      const tabsContainer = document.getElementById('category-tabs');
+      if (!tabsContainer) return;
+
+      tabsContainer.innerHTML = categories
+        .map((cat) => {
+          const isActive = cat === activeCategory;
+          const count = cat === 'Todas' ? menuItems.length : menuItems.filter((i) => i.category === cat).length;
+          return `
+            <button
+              onclick="selectCategory('${cat}')"
+              class="whitespace-nowrap px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 ${
+                isActive
+                  ? 'bg-copper-500 text-beagle-950 shadow-md shadow-copper-500/25'
+                  : 'bg-beagle-950/60 hover:bg-beagle-800 text-bone/80 border border-white/10'
+              }"
+            >
+              <span>${cat}</span>
+              <span class="px-1.5 py-0.5 rounded-full text-[10px] ${isActive ? 'bg-beagle-950/25 text-beagle-950 font-bold' : 'bg-white/10 text-bone/60'}">${count}</span>
+            </button>
+          `;
+        })
+        .join('');
+    }
+
+    function selectCategory(category) {
+      activeCategory = category;
+      renderCategoryTabs();
+      renderMenu();
+    }
+
+    function handleMenuSearch(value) {
+      searchQuery = value.trim().toLowerCase();
+      document.getElementById('clear-search-btn')?.classList.toggle('hidden', searchQuery.length === 0);
+      renderMenu();
+    }
+
+    function clearMenuSearch() {
+      const input = document.getElementById('menu-search-input');
+      if (input) input.value = '';
+      searchQuery = '';
+      document.getElementById('clear-search-btn')?.classList.add('hidden');
+      activeCategory = 'Todas';
+      renderCategoryTabs();
+      renderMenu();
+    }
+
+    function normalizeText(str) {
+      return str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    }
+
+    function renderMenu() {
+      const grid = document.getElementById('menu-grid');
+      const emptyState = document.getElementById('menu-empty-state');
+      const counter = document.getElementById('menu-results-count');
+      if (!grid) return;
+
+      const normalizedQuery = normalizeText(searchQuery);
+      const filtered = menuItems.filter((item) => {
+        const matchesCat = activeCategory === 'Todas' || item.category === activeCategory;
+        if (!matchesCat) return false;
+        if (!normalizedQuery) return true;
+        return normalizeText(`${item.name} ${item.desc} ${item.category} ${item.badge || ''}`).includes(normalizedQuery);
+      });
+
+      if (counter) {
+        counter.textContent = `${filtered.length} ${filtered.length === 1 ? 'producto' : 'productos'}`;
+      }
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+
+      emptyState?.classList.add('hidden');
+
+      grid.innerHTML = filtered
+        .map((item) => {
+          const inCart = cart.find((c) => c.id === item.id);
+          const qtyBadge = inCart ? `<span class="ml-1.5 px-2 py-0.5 rounded-full bg-beagle-950 text-copper-400 text-[11px] font-bold">${inCart.qty}</span>` : '';
+
+          const priceDisplay = isAdminAuthenticated
+            ? `
+              <div class="flex items-center gap-1.5 bg-beagle-950 border border-copper-500/60 rounded-xl px-2.5 py-1">
+                <span class="text-xs text-copper-400 font-bold">$</span>
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  value="${item.price}"
+                  onchange="updateItemPrice('${item.id}', this.value)"
+                  class="w-24 bg-transparent text-bone font-bold text-sm focus:outline-none"
+                />
+              </div>
+            `
+            : `<span class="text-lg sm:text-xl font-bold text-copper-400">${formatARS(item.price)}</span>`;
+
+          return `
+            <article class="glass-beagle rounded-2xl p-5 flex flex-col justify-between hover:border-copper-500/50 transition-all group">
+              <div>
+                <div class="flex items-center justify-between gap-2 mb-2.5">
+                  <span class="px-2.5 py-0.5 rounded-lg bg-beagle-950/70 border border-white/10 text-copper-400 text-[11px] font-semibold uppercase tracking-wider">
+                    ${item.category}
+                  </span>
+                  ${item.badge ? `<span class="px-2.5 py-0.5 rounded-lg bg-copper-500/20 text-copper-400 text-[11px] font-semibold">★ ${item.badge}</span>` : ''}
+                </div>
+                <h3 class="font-serif text-lg sm:text-xl font-semibold text-bone group-hover:text-copper-400 transition-colors leading-snug">
+                  ${item.name}
+                </h3>
+                <p class="text-xs sm:text-sm text-bone/75 mt-1.5 leading-relaxed">
+                  ${item.desc}
+                </p>
+              </div>
+
+              <div class="pt-4 mt-4 border-t border-white/10 flex items-center justify-between gap-3">
+                <div>
+                  <span class="block text-[10px] uppercase tracking-wider text-bone/50">Precio</span>
+                  ${priceDisplay}
+                </div>
+
+                <button
+                  onclick="addToCart('${item.id}')"
+                  class="px-4 py-2.5 rounded-xl bg-copper-500 hover:bg-copper-600 active:scale-95 text-beagle-950 font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5"
+                >
+                  <i class="fa-solid fa-plus"></i>
+                  <span>Agregar</span>
+                  ${qtyBadge}
+                </button>
+              </div>
+            </article>
+          `;
+        })
+        .join('');
+    }
+
+    function openAdminModal() {
+      if (isAdminAuthenticated) {
+        showToast('El modo administrador ya está activo. Editá los precios directamente en la carta.', 'info');
+        document.getElementById('carta')?.scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      const modal = document.getElementById('admin-modal');
+      modal?.classList.remove('hidden');
+      modal?.classList.add('flex');
+      setTimeout(() => document.getElementById('admin-pin-input')?.focus(), 100);
+    }
+
+    function closeAdminModal() {
+      const modal = document.getElementById('admin-modal');
+      modal?.classList.add('hidden');
+      modal?.classList.remove('flex');
+      const input = document.getElementById('admin-pin-input');
+      if (input) input.value = '';
+    }
+
+    function verifyAdminPin(event) {
+      event.preventDefault();
+      const input = document.getElementById('admin-pin-input');
+      const entered = input ? input.value.trim() : '';
+
+      if (entered === ADMIN_PIN) {
+        isAdminAuthenticated = true;
+        closeAdminModal();
+        document.getElementById('admin-banner')?.classList.remove('hidden');
+        const lockIcon = document.getElementById('admin-lock-icon');
+        if (lockIcon) {
+          lockIcon.classList.remove('fa-lock');
+          lockIcon.classList.add('fa-lock-open', 'text-emerald-400');
+        }
+        renderMenu();
+        showToast('Acceso administrador concedido. Ya podés editar los precios.', 'success');
+        document.getElementById('carta')?.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        showToast('Clave incorrecta. Ingresá la clave de administrador.', 'error');
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+      }
+    }
+
+    function updateItemPrice(itemId, newPriceRaw) {
+      if (!isAdminAuthenticated) return;
+      const numericPrice = Math.max(0, parseFloat(newPriceRaw) || 0);
+      const item = menuItems.find((i) => i.id === itemId);
+      if (item) {
+        item.price = numericPrice;
+        saveMenuToStorage();
+        const cartItem = cart.find((c) => c.id === itemId);
+        if (cartItem) {
+          cartItem.price = numericPrice;
+          saveCartToStorage();
+          renderCart();
+        }
+        showToast(`Precio de "${item.name}" actualizado a ${formatARS(numericPrice)}.`, 'success');
+      }
+    }
+
+    function resetMenuPrices() {
+      menuItems = JSON.parse(JSON.stringify(DEFAULT_MENU_ITEMS));
+      saveMenuToStorage();
+      renderMenu();
+      showToast('Precios restaurados a los valores originales.', 'info');
+    }
+
+    function logoutAdmin() {
+      isAdminAuthenticated = false;
+      document.getElementById('admin-banner')?.classList.add('hidden');
+      const lockIcon = document.getElementById('admin-lock-icon');
+      if (lockIcon) {
+        lockIcon.classList.remove('fa-lock-open', 'text-emerald-400');
+        lockIcon.classList.add('fa-lock');
+      }
+      renderMenu();
+      showToast('Sesión de administrador cerrada.', 'info');
+    }
+
+    function addToCart(itemId) {
+      const product = menuItems.find((i) => i.id === itemId);
+      if (!product) return;
+
+      const existing = cart.find((c) => c.id === itemId);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ id: product.id, name: product.name, price: product.price, qty: 1 });
+      }
+
+      saveCartToStorage();
+      renderCart();
+      renderMenu();
+      showToast(`"${product.name}" agregado al carrito.`, 'success');
+    }
+
+    function updateCartQty(itemId, delta) {
+      const idx = cart.findIndex((c) => c.id === itemId);
+      if (idx === -1) return;
+      cart[idx].qty += delta;
+      if (cart[idx].qty <= 0) cart.splice(idx, 1);
+      saveCartToStorage();
+      renderCart();
+      renderMenu();
+    }
+
+    function clearCart() {
+      cart = [];
+      saveCartToStorage();
+      renderCart();
+      renderMenu();
+    }
+
+    function renderCart() {
+      const container = document.getElementById('cart-items-container');
+      const badge = document.getElementById('cart-badge');
+      const floatingCount = document.getElementById('floating-cart-count');
+      const totalEl = document.getElementById('cart-total-price');
+
+      const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+      const totalPrice = cart.reduce((acc, item) => acc + item.price * item.qty, 0);
+
+      if (badge) badge.textContent = totalItems;
+      if (floatingCount) floatingCount.textContent = totalItems;
+      if (totalEl) totalEl.textContent = formatARS(totalPrice);
+
+      if (!container) return;
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center py-12 px-4">
+            <div class="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center text-copper-500/60 text-2xl mb-3">
+              <i class="fa-solid fa-basket-shopping"></i>
+            </div>
+            <h4 class="font-serif text-lg font-semibold text-bone">Tu carrito está vacío</h4>
+            <p class="text-xs text-bone/65 mt-1 max-w-xs">
+              Agregá platos de nuestra Carta Digital para enviar tu pedido por WhatsApp.
+            </p>
+            <button onclick="toggleCartDrawer(false)" class="mt-4 px-4 py-2 rounded-xl bg-copper-500 text-beagle-950 text-xs font-bold">
+              Explorar la Carta
+            </button>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="flex items-center justify-between pb-2">
+          <span class="text-xs text-bone/65 font-semibold">${totalItems} ${totalItems === 1 ? 'ítem' : 'ítems'} seleccionados</span>
+          <button onclick="clearCart()" class="text-xs text-copper-400 hover:underline">Vaciar carrito</button>
+        </div>
+        ${cart
+          .map(
+            (item) => `
+          <div class="p-3.5 rounded-xl bg-beagle-950/70 border border-white/10 flex items-center justify-between gap-3">
+            <div class="min-w-0 flex-1">
+              <h5 class="text-sm font-semibold text-bone truncate">${item.name}</h5>
+              <span class="text-xs text-copper-400 font-semibold">${formatARS(item.price)} c/u</span>
+            </div>
+            <div class="flex items-center gap-2 bg-beagle-900 rounded-lg p-1 border border-white/10">
+              <button onclick="updateCartQty('${item.id}', -1)" class="w-7 h-7 rounded hover:bg-white/10 text-bone/75 flex items-center justify-center text-xs">
+                <i class="fa-solid fa-minus"></i>
+              </button>
+              <span class="w-6 text-center text-xs font-bold text-bone">${item.qty}</span>
+              <button onclick="updateCartQty('${item.id}', 1)" class="w-7 h-7 rounded hover:bg-white/10 text-bone flex items-center justify-center text-xs">
+                <i class="fa-solid fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        `
+          )
+          .join('')}
+      `;
+    }
+
+    function toggleCartDrawer(open) {
+      const drawer = document.getElementById('cart-drawer');
+      const backdrop = document.getElementById('cart-drawer-backdrop');
+      if (!drawer || !backdrop) return;
+
+      if (open) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+          backdrop.classList.remove('opacity-0');
+          drawer.classList.remove('translate-x-full');
+        }, 10);
+      } else {
+        backdrop.classList.add('opacity-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      }
+    }
+
+    function handleOrderModeChange(mode) {
+      const tableWrapper = document.getElementById('table-number-wrapper');
+      const deliveryWrapper = document.getElementById('delivery-address-wrapper');
+      if (mode === 'En el local') {
+        tableWrapper?.classList.remove('hidden');
+        deliveryWrapper?.classList.add('hidden');
+      } else if (mode === 'Delivery') {
+        tableWrapper?.classList.add('hidden');
+        deliveryWrapper?.classList.remove('hidden');
+      } else {
+        tableWrapper?.classList.add('hidden');
+        deliveryWrapper?.classList.add('hidden');
+      }
+    }
+
+    function sendOrderToWhatsApp(event) {
+      event.preventDefault();
+
+      if (cart.length === 0) {
+        showToast('Agregá al menos un producto de la carta antes de continuar.', 'error');
+        return;
+      }
+
+      const customerName = document.getElementById('order-customer-name')?.value.trim();
+      const modeRadio = document.querySelector('input[name="order-mode"]:checked');
+      const orderMode = modeRadio ? modeRadio.value : 'En el local';
+      const tableNumber = document.getElementById('order-table-number')?.value.trim();
+      const deliveryAddress = document.getElementById('order-delivery-address')?.value.trim();
+
+      if (!customerName) {
+        showToast('Por favor ingresá tu nombre.', 'error');
+        return;
+      }
+      if (orderMode === 'En el local' && !tableNumber) {
+        showToast('Indicá el número de mesa donde estás ubicado.', 'error');
+        document.getElementById('order-table-number')?.focus();
+        return;
+      }
+      if (orderMode === 'Delivery' && !deliveryAddress) {
+        showToast('Indicá tu dirección de delivery en Ushuaia.', 'error');
+        document.getElementById('order-delivery-address')?.focus();
+        return;
+      }
+
+      const totalAmount = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const itemsLines = cart
+        .map((item) => `• ${item.qty}x ${item.name} (${formatARS(item.price * item.qty)})`)
+        .join('\n');
+
+      let locationDetail = '';
+      if (orderMode === 'En el local') {
+        locationDetail = `🪑 *Mesa en el local:* ${tableNumber}`;
+      } else if (orderMode === 'Delivery') {
+        locationDetail = `🛵 *Dirección Delivery:* ${deliveryAddress}`;
+      } else {
+        locationDetail = `🛍️ *Modalidad:* Retiro para llevar en Av. San Martín 232`;
+      }
+
+      const message =
+        `🦀 *NUEVO PEDIDO - LA CASA DE LOS MARISCOS*\n` +
+        `👤 *Nombre:* ${customerName}\n` +
+        `📍 *Consumo:* ${orderMode}\n` +
+        `${locationDetail}\n\n` +
+        `🍽️ *Platos seleccionados:*\n${itemsLines}\n\n` +
+        `💰 *Total Estimado:* ${formatARS(totalAmount)}`;
+
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+      showToast('Redirigiendo a WhatsApp con tu pedido...', 'success');
+    }
+
+    function submitReservationWhatsApp(event) {
+      event.preventDefault();
+
+      const name = document.getElementById('res-name')?.value.trim();
+      const guests = document.getElementById('res-guests')?.value;
+      const date = document.getElementById('res-date')?.value;
+      const time = document.getElementById('res-time')?.value;
+      const email = document.getElementById('res-email')?.value.trim();
+
+      if (!name || !guests || !date || !time) {
+        showToast('Completá todos los campos obligatorios de la reserva.', 'error');
+        return;
+      }
+
+      const message =
+        `📅 *RESERVA DE MESA - LA CASA DE LOS MARISCOS*\n` +
+        `👤 *Nombre:* ${name}\n` +
+        `👥 *Personas:* ${guests}\n` +
+        `📆 *Fecha:* ${date}\n` +
+        `⏰ *Hora:* ${time}\n` +
+        (email ? `📧 *Mail:* ${email}\n` : '') +
+        `📍 *Dirección:* Av. San Martín 232, Ushuaia`;
+
+      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
+      showToast('Abriendo WhatsApp para enviar tu reserva...', 'success');
+    }
+
+    function openLightbox(index) {
+      currentLightboxIndex = index;
+      updateLightboxContent();
+      const lb = document.getElementById('gallery-lightbox');
+      lb?.classList.remove('hidden');
+      lb?.classList.add('flex');
+    }
+
+    function closeLightbox() {
+      const lb = document.getElementById('gallery-lightbox');
+      lb?.classList.add('hidden');
+      lb?.classList.remove('flex');
+    }
+
+    function navigateLightbox(step) {
+      currentLightboxIndex = (currentLightboxIndex + step + GALLERY_PHOTOS.length) % GALLERY_PHOTOS.length;
+      updateLightboxContent();
+    }
+
+    function updateLightboxContent() {
+      const photo = GALLERY_PHOTOS[currentLightboxIndex];
+      const img = document.getElementById('lightbox-img');
+      if (img) {
+        img.src = photo.src;
+        img.style.objectPosition = photo.objectPos;
+      }
+      document.getElementById('lightbox-badge').textContent = `${photo.badge} (${currentLightboxIndex + 1}/5)`;
+      document.getElementById('lightbox-title').textContent = photo.title;
+      document.getElementById('lightbox-desc').textContent = photo.desc;
+    }
+
+    function toggleMobileMenu() {
+      document.getElementById('mobileMenu')?.classList.toggle('hidden');
+    }
+
+    function copyTextFallback(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try { document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(textarea);
+    }
+
+    function copyLocationLink() {
+      copyTextFallback('La Casa de los Mariscos - Av. San Martín 232, Ushuaia: https://maps.app.goo.gl/6HYg1YcoDav3NHMd6');
+      showToast('Ubicación copiada para enviar a tu teléfono.', 'success');
+    }
+
+    function shareRestaurant() {
+      const url = 'https://maps.app.goo.gl/6HYg1YcoDav3NHMd6';
+      if (navigator.share) {
+        navigator.share({ title: 'La Casa de los Mariscos - Ushuaia', url }).catch(() => {});
+      } else {
+        copyTextFallback(url);
+        showToast('Enlace del restaurante copiado.', 'success');
+      }
+    }
+
+    function saveRestaurantBookmark() {
+      showToast('Ubicación guardada en tus favoritos.', 'info');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+
+      const styles = {
+        success: 'border-emerald-400/50 bg-beagle-950/95 text-emerald-200',
+        error: 'border-rose-400/50 bg-beagle-950/95 text-rose-200',
+        info: 'border-copper-500/50 bg-beagle-950/95 text-bone'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `pointer-events-auto p-3.5 rounded-xl border backdrop-blur-xl shadow-2xl flex items-center gap-3 text-xs sm:text-sm transition-all duration-300 ${styles[type] || styles.info}`;
+      toast.innerHTML = `<i class="fa-solid fa-circle-info text-copper-400"></i><span class="flex-1">${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+      }, 3400);
+    }
+
+    async function downloadProjectZip() {
+      if (typeof JSZip === 'undefined') return;
+      showToast('Generando paquete .ZIP con HTML, CSS, JavaScript y Three.js...', 'info');
+
+      try {
+        const zip = new JSZip();
+        const styleContent = document.querySelector('style')?.innerHTML || '';
+        const scriptContent = document.scripts[document.scripts.length - 1]?.innerHTML || '';
+
+        zip.file('index.html', '<!DOCTYPE html>\n' + document.documentElement.outerHTML);
+        zip.file('styles.css', `/* LA CASA DE LOS MARISCOS - USHUAIA */\n${styleContent.trim()}`);
+        zip.file('three-anim.js', `/* THREE.JS 3D SCENE */\n${initThreeJSBackground.toString()}\nwindow.addEventListener('load', initThreeJSBackground);`);
+        zip.file('app.js', `/* APP LOGIC */\n${scriptContent.trim()}`);
+        zip.file('README.md', '# La Casa de los Mariscos - Ushuaia\nColocá "CASA DE MARISCOS.jpg" junto a index.html.\nClave Admin: 0608\nUbicación: https://maps.app.goo.gl/6HYg1YcoDav3NHMd6');
+
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'La-Casa-de-los-Mariscos-Ushuaia.zip';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showToast('¡ZIP descargado! Colocá "CASA DE MARISCOS.jpg" en la misma carpeta.', 'success');
+      } catch (err) {
+        showToast('No se pudo generar el ZIP.', 'error');
+      }
+    }
+  </script>
 </body>
 </html>
