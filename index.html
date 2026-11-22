@@ -108,9 +108,9 @@
       .hero-motion { animation: none; }
     }
 
-    /* Fondo de secciones con la foto auténtica CASA DE MARISCOS.jpg (velo pastel) */
+    /* Fondo de secciones con la foto auténtica CASA DE MARISCOS.jpg (velo pastel sutil) */
     .section-bg-facade {
-      background-image: linear-gradient(to bottom, rgba(253, 242, 246, 0.93), rgba(248, 227, 236, 0.90), rgba(253, 242, 246, 0.95)), url('CASA DE MARISCOS.jpg');
+      background-image: linear-gradient(to bottom, rgba(253, 242, 246, 0.85), rgba(248, 227, 236, 0.82), rgba(253, 242, 246, 0.88)), url('CASA DE MARISCOS.jpg');
       background-size: cover;
       background-position: center;
       background-attachment: fixed;
@@ -137,15 +137,15 @@
     }
 
     .dynamic-title-cycle.title-hidden {
-      opacity: 0.05;
+      opacity: 0.15;
       transform: translateY(-14px) scale(0.97);
-      filter: blur(3px);
+      filter: blur(2px);
       pointer-events: none;
     }
 
     /* Tarjetas Glassmorphism pastel estilo Blush */
     .glass-beagle {
-      background: rgba(255, 250, 252, 0.66);
+      background: rgba(255, 250, 252, 0.78);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 1px solid rgba(180, 84, 130, 0.18);
@@ -288,9 +288,9 @@
             class="w-full h-full object-cover object-center hero-motion"
           />
         </div>
-        <!-- Degradados pastel equilibrados para lectura editorial y visibilidad nítida de la fachada -->
-        <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/90 via-beagle-950/60 to-beagle-900/20"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-beagle-900 via-transparent to-beagle-950/45"></div>
+        <!-- Degradados sutiles para legibilidad sin ocultar la fachada -->
+        <div class="absolute inset-0 bg-gradient-to-r from-beagle-950/40 via-transparent to-beagle-900/10"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-beagle-900/50 via-transparent to-beagle-950/20"></div>
       </div>
 
       <!-- Contenido Central del Hero -->
@@ -307,11 +307,11 @@
 
           <!-- Bloque de Títulos Dinámicos (Desaparecen cada 3 segundos para apreciar la foto de fondo) -->
           <div class="dynamic-title-cycle title-visible">
-            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-semibold text-bone leading-[1.08] tracking-tight drop-shadow-[0_6px_24px_rgba(253,242,246,0.85)]">
+            <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-semibold text-bone leading-[1.08] tracking-tight drop-shadow-[0_4px_16px_rgba(253,242,246,0.6)]">
               La Casa de los <span class="italic font-normal text-copper-400">Mariscos</span>
             </h1>
 
-            <p class="mt-5 text-base sm:text-lg md:text-xl text-bone/90 font-light leading-relaxed max-w-2xl drop-shadow-[0_2px_12px_rgba(253,242,246,0.9)]">
+            <p class="mt-5 text-base sm:text-lg md:text-xl text-bone/95 font-light leading-relaxed max-w-2xl drop-shadow-[0_2px_8px_rgba(253,242,246,0.5)]">
               El sabor auténtico del Fin del Mundo. Centolla entera del Canal Beagle, cazuelas artesanales, merluza negra y comida casera fueguina en nuestra emblemática casa de Av. San Martín 232.
             </p>
           </div>
@@ -333,37 +333,6 @@
               <i class="fa-regular fa-calendar-check text-copper-400"></i>
               <span>Reservar una Mesa</span>
             </a>
-          </div>
-
-          <!-- Información Permanente del Local (Datos de Google Maps) -->
-          <div class="mt-12 pt-7 border-t border-white/20 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-            <div class="flex flex-wrap items-center gap-5 sm:gap-7 text-xs sm:text-sm text-bone/90 bg-beagle-950/65 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10">
-              <div>
-                <span class="block text-copper-400 font-serif text-base font-semibold">Marisquería · (3.963)</span>
-                <span class="text-bone/75">Rango: $ 30.000 - 70.000</span>
-              </div>
-              <div class="h-8 w-[1px] bg-white/15"></div>
-              <div>
-                <span class="block text-copper-400 font-serif text-base font-semibold">Av. San Martín 232</span>
-                <span class="text-bone/75">V9410 Ushuaia, Tierra del Fuego</span>
-              </div>
-            </div>
-
-            <!-- Accesos directos estilo ficha de Google Maps -->
-            <div class="flex flex-wrap items-center gap-2 bg-beagle-950/80 p-1.5 rounded-xl border border-white/15 backdrop-blur-md self-start lg:self-auto">
-              <a href="https://maps.app.goo.gl/6HYg1YcoDav3NHMd6" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-copper-500 text-beagle-950 hover:bg-copper-400 transition-all">
-                Cómo llegar
-              </a>
-              <button onclick="saveRestaurantBookmark()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
-                Guardar
-              </button>
-              <button onclick="copyLocationLink()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
-                Enviar al teléfono
-              </button>
-              <button onclick="shareRestaurant()" class="px-3 py-1.5 rounded-lg text-xs font-medium text-bone/80 hover:text-bone hover:bg-white/10 transition-all">
-                Compartir
-              </button>
-            </div>
           </div>
 
         </div>
@@ -453,7 +422,7 @@
               alt="Fachada principal de La Casa de los Mariscos en Av. San Martín 232, Ushuaia"
               class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/30 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/70 via-transparent to-transparent"></div>
             <div class="absolute top-5 right-5 px-3.5 py-1.5 rounded-full bg-beagle-950/80 backdrop-blur-md border border-copper-500/40 text-xs font-medium text-copper-400">
               01 / 05 · Foto Principal
             </div>
@@ -473,7 +442,7 @@
                 alt="Cartel tradicional con centolla de La Casa de los Mariscos Ushuaia"
                 class="w-full h-full object-cover object-[22%_12%] scale-125 group-hover:scale-135 transition-transform duration-700 ease-out"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/70 via-transparent to-transparent"></div>
               <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">02 / 05</div>
               <div class="absolute bottom-0 left-0 right-0 p-5">
                 <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Insignia del Local</span>
@@ -488,7 +457,7 @@
                 alt="Pizarra Hay Centolla Entera en La Casa de los Mariscos"
                 class="w-full h-full object-cover object-[35%_58%] scale-150 group-hover:scale-165 transition-transform duration-700 ease-out"
               />
-              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/70 via-transparent to-transparent"></div>
               <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">03 / 05</div>
               <div class="absolute bottom-0 left-0 right-0 p-5">
                 <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Pesca Fresca</span>
@@ -504,7 +473,7 @@
               alt="Ventanales azules con siluetas de centolla y salón cálido"
               class="w-full h-full object-cover object-[76%_55%] scale-135 group-hover:scale-145 transition-transform duration-700 ease-out"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/70 via-transparent to-transparent"></div>
             <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">04 / 05</div>
             <div class="absolute bottom-0 left-0 right-0 p-6">
               <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Salón & Calidez</span>
@@ -518,7 +487,7 @@
               alt="Marquesina Comida Casera y Minutas en La Casa de los Mariscos"
               class="w-full h-full object-cover object-[68%_24%] scale-130 group-hover:scale-140 transition-transform duration-700 ease-out"
             />
-            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/95 via-beagle-950/40 to-transparent"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-beagle-950/70 via-transparent to-transparent"></div>
             <div class="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-beagle-950/80 border border-copper-500/40 text-[11px] text-copper-400">05 / 05</div>
             <div class="absolute bottom-0 left-0 right-0 p-6">
               <span class="text-[11px] uppercase tracking-[0.2em] text-copper-400 font-medium">Gastronomía Patagónica</span>
